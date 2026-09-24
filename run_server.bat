@@ -15,4 +15,4 @@ if not exist "target\classes\vn\ptit\network\Main.class" (
 )
 
 echo [*] Starting T45 Network Server with Java 21...
-"%JAVA%" -Dfile.encoding=UTF-8 -cp "target\classes" vn.ptit.network.Main %*
+"%JAVA%" -Dfile.encoding=UTF-8 -cp "target\classes;lib/*" vn.ptit.network.Main %*

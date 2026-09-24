@@ -25,8 +25,8 @@ if not exist "target\classes" (
     mkdir "target\classes"
 )
 
-echo [*] Compiling Java source files with Java 21 LTS...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $files = (Get-ChildItem -Path 'src/main/java' -Recurse -Filter *.java).FullName; if ($files.Count -eq 0) { Write-Error 'No Java files found'; exit 1 }; & '%JAVAC%' -encoding UTF-8 -d 'target/classes' $files }"
+echo [*] Compiling Java source files with Java 21 LTS + Lombok...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $files = (Get-ChildItem -Path 'src/main/java' -Recurse -Filter *.java).FullName; if ($files.Count -eq 0) { Write-Error 'No Java files found'; exit 1 }; & '%JAVAC%' -encoding UTF-8 -cp 'lib/*' -processorpath 'lib/lombok.jar' -d 'target/classes' $files }"
 if errorlevel 1 (
     echo [FAILED] Compilation failed!
     exit /b 1

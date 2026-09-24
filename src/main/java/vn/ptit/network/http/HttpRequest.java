@@ -1,5 +1,10 @@
 package vn.ptit.network.http;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +17,11 @@ import java.util.Map;
 
 /**
  * Lớp phân tích cú pháp (parser) gói tin HTTP/1.1 thủ công từ Socket InputStream.
- * Không phụ thuộc bất kỳ thư viện bên ngoài nào, đảm bảo tối ưu hóa và minh bạch tầng mạng.
+ * Sử dụng Lombok (@Getter, @ToString, @AllArgsConstructor) để tinh giản mã nguồn tối đa.
  */
+@Getter
+@ToString
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class HttpRequest {
     private final String method;
     private final String rawUri;
@@ -23,22 +31,8 @@ public class HttpRequest {
     private final Map<String, String> headers;
     private final String body;
 
-    private HttpRequest(String method, String rawUri, String path, String protocol,
-                        Map<String, String> queryParams, Map<String, String> headers, String body) {
-        this.method = method;
-        this.rawUri = rawUri;
-        this.path = path;
-        this.protocol = protocol;
-        this.queryParams = Collections.unmodifiableMap(queryParams);
-        this.headers = Collections.unmodifiableMap(headers);
-        this.body = body;
-    }
-
     /**
      * Phân tích một HTTP Request từ InputStream của Socket.
-     * @param in InputStream từ client socket
-     * @return HttpRequest đối tượng chứa thông tin đã phân tích cú pháp
-     * @throws IOException nếu có lỗi đọc mạng hoặc kết nối bị đóng đột ngột
      */
     public static HttpRequest parse(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
@@ -109,27 +103,12 @@ public class HttpRequest {
             } catch (NumberFormatException ignored) {}
         }
 
-        return new HttpRequest(method, rawUri, path, protocol, queryParams, headers, bodyBuilder.toString());
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public String getRawUri() {
-        return rawUri;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public Map<String, String> getQueryParams() {
-        return queryParams;
+        return new HttpRequest(
+                method, rawUri, path, protocol,
+                Collections.unmodifiableMap(queryParams),
+                Collections.unmodifiableMap(headers),
+                bodyBuilder.toString()
+        );
     }
 
     public String getQueryParam(String key) {
@@ -150,20 +129,7 @@ public class HttpRequest {
         }
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
     public String getHeader(String name) {
         return headers.get(name.toLowerCase());
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    @Override
-    public String toString() {
-        return method + " " + path + " " + protocol;
     }
 }

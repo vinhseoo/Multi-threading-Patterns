@@ -22,6 +22,12 @@
     <!-- Dự án sử dụng 100% Java Standard Library (java.net, java.util.concurrent, java.lang.management) -->
     <!-- Không phụ thuộc thư viện ngoài để đáp ứng chuẩn cốt lõi môn Lập Trình Mạng -->
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -35,6 +41,13 @@
                     <target>21</target>
                     <release>21</release>
                     <encoding>UTF-8</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.34</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>

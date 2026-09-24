@@ -1,5 +1,7 @@
 package vn.ptit.network.http;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -8,8 +10,9 @@ import java.util.Map;
 
 /**
  * Lớp xây dựng (builder) và gửi phản hồi HTTP/1.1 chuẩn về client.
- * Tự động tính toán Content-Length, quản lý header và xuất luồng byte mạng qua Socket OutputStream.
+ * Tận dụng Lombok @Getter cho các thuộc tính trạng thái.
  */
+@Getter
 public class HttpResponse {
     private final int statusCode;
     private final String statusText;
@@ -33,53 +36,35 @@ public class HttpResponse {
     }
 
     public HttpResponse setBody(String body, String contentType) {
-        if (body != null) {
-            this.bodyBytes = body.getBytes(StandardCharsets.UTF_8);
-        } else {
-            this.bodyBytes = new byte[0];
-        }
+        this.bodyBytes = (body != null) ? body.getBytes(StandardCharsets.UTF_8) : new byte[0];
         setHeader("Content-Type", contentType + "; charset=utf-8");
         setHeader("Content-Length", String.valueOf(this.bodyBytes.length));
         return this;
     }
 
     public HttpResponse setBodyBytes(byte[] bytes, String contentType) {
-        this.bodyBytes = bytes != null ? bytes : new byte[0];
+        this.bodyBytes = (bytes != null) ? bytes : new byte[0];
         setHeader("Content-Type", contentType);
         setHeader("Content-Length", String.valueOf(this.bodyBytes.length));
         return this;
     }
 
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public byte[] getBodyBytes() {
-        return bodyBytes;
-    }
-
     /**
-     * Ghi toàn bộ gói tin HTTP (Status line + Headers + CRLF + Body) xuống OutputStream của Socket.
+     * Ghi toàn bộ gói tin HTTP xuống OutputStream của Socket.
      */
     public void writeTo(OutputStream out) throws IOException {
         StringBuilder headerBuilder = new StringBuilder();
-        // 1. Status Line: HTTP/1.1 200 OK\r\n
         headerBuilder.append("HTTP/1.1 ").append(statusCode).append(" ").append(statusText).append("\r\n");
 
-        // Đảm bảo có Content-Length
         if (!headers.containsKey("Content-Length")) {
             headers.put("Content-Length", String.valueOf(bodyBytes.length));
         }
 
-        // 2. Headers
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             headerBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\r\n");
         }
 
-        // 3. Phân cách giữa Header và Body bằng CRLF trống
         headerBuilder.append("\r\n");
-
-        // 4. Ghi xuống luồng mạng
         out.write(headerBuilder.toString().getBytes(StandardCharsets.UTF_8));
         if (bodyBytes.length > 0) {
             out.write(bodyBytes);
@@ -87,7 +72,7 @@ public class HttpResponse {
         out.flush();
     }
 
-    // ================= STATIC FACTORY CONVENIENCE METHODS =================
+    // ================= STATIC FACTORIES =================
 
     public static HttpResponse okJson(String json) {
         return new HttpResponse(200, "OK").setBody(json, "application/json");

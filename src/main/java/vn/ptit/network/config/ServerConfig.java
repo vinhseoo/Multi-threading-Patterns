@@ -1,10 +1,20 @@
 package vn.ptit.network.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 /**
  * Cấu hình tham số hoạt động cho hệ thống máy chủ mạng T45.
- * Được thiết kế linh hoạt, cho phép tinh chỉnh số lượng luồng, kích thước hàng đợi,
- * độ sâu TCP Backlog và timeout mạng.
+ * Được tinh giản tối đa nhờ Lombok annotations (@Data, @Builder, @Accessors(chain = true)).
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class ServerConfig {
     public static final int DEFAULT_PORT = 8080;
     public static final int DEFAULT_BACKLOG = 1024;
@@ -13,82 +23,26 @@ public class ServerConfig {
     public static final int DEFAULT_QUEUE_CAPACITY = 1000;
     public static final int DEFAULT_SOCKET_TIMEOUT_MS = 15000;
 
+    @Builder.Default
     private int port = DEFAULT_PORT;
+
+    @Builder.Default
     private int backlog = DEFAULT_BACKLOG;
+
+    @Builder.Default
     private int corePoolSize = DEFAULT_CORE_POOL_SIZE;
+
+    @Builder.Default
     private int maxPoolSize = DEFAULT_MAX_POOL_SIZE;
+
+    @Builder.Default
     private int queueCapacity = DEFAULT_QUEUE_CAPACITY;
+
+    @Builder.Default
     private int socketTimeoutMs = DEFAULT_SOCKET_TIMEOUT_MS;
 
-    public ServerConfig() {}
-
     public ServerConfig(int port) {
+        this();
         this.port = port;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public ServerConfig setPort(int port) {
-        this.port = port;
-        return this;
-    }
-
-    public int getBacklog() {
-        return backlog;
-    }
-
-    public ServerConfig setBacklog(int backlog) {
-        this.backlog = backlog;
-        return this;
-    }
-
-    public int getCorePoolSize() {
-        return corePoolSize;
-    }
-
-    public ServerConfig setCorePoolSize(int corePoolSize) {
-        this.corePoolSize = corePoolSize;
-        return this;
-    }
-
-    public int getMaxPoolSize() {
-        return maxPoolSize;
-    }
-
-    public ServerConfig setMaxPoolSize(int maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
-        return this;
-    }
-
-    public int getQueueCapacity() {
-        return queueCapacity;
-    }
-
-    public ServerConfig setQueueCapacity(int queueCapacity) {
-        this.queueCapacity = queueCapacity;
-        return this;
-    }
-
-    public int getSocketTimeoutMs() {
-        return socketTimeoutMs;
-    }
-
-    public ServerConfig setSocketTimeoutMs(int socketTimeoutMs) {
-        this.socketTimeoutMs = socketTimeoutMs;
-        return this;
-    }
-
-    @Override
-    public String toString() {
-        return "ServerConfig{" +
-                "port=" + port +
-                ", backlog=" + backlog +
-                ", corePoolSize=" + corePoolSize +
-                ", maxPoolSize=" + maxPoolSize +
-                ", queueCapacity=" + queueCapacity +
-                ", socketTimeoutMs=" + socketTimeoutMs +
-                '}';
     }
 }
