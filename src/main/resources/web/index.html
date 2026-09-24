@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T45 Network Dashboard | PTIT Multi-Threading Patterns</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- TOP HEADER -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <div class="logo-box">
+                    <span class="logo-icon">⚡</span>
+                    <div>
+                        <div class="brand-title">T45 MULTI-THREADING DASHBOARD</div>
+                        <div class="brand-subtitle">Học viện Công nghệ Bưu chính Viễn thông (PTIT) • GV: TS. Đặng Ngọc Hùng</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-center">
+                <div class="mode-badge" id="currentModeBadge">
+                    <span class="pulse-dot"></span>
+                    <span id="modeNameDisplay">Đang tải mô hình...</span>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="status-pill">
+                    <span class="live-indicator"></span>
+                    <span>LIVE POLLING: <b>500ms</b></span>
+                </div>
+                <div class="uptime-box">
+                    UPTIME: <span id="uptimeDisplay" class="mono">00:00:00</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI SUMMARY CARDS -->
+        <section class="kpi-grid">
+            <!-- CARD 1: THROUGHPUT -->
+            <div class="kpi-card cyan">
+                <div class="kpi-header">
+                    <span class="kpi-title">THROUGHPUT (RPS)</span>
+                    <span class="kpi-icon">⚡</span>
+                </div>
+                <div class="kpi-value mono" id="kpiRps">0.0</div>
+                <div class="kpi-footer">
+                    <span>Đỉnh cao: <b id="kpiPeakRps" class="mono">0.0</b> req/s</span>
+                </div>
+            </div>
+
+            <!-- CARD 2: TOTAL REQUESTS -->
+            <div class="kpi-card emerald">
+                <div class="kpi-header">
+                    <span class="kpi-title">TOTAL REQUESTS</span>
+                    <span class="kpi-icon">📈</span>
+                </div>
+                <div class="kpi-value mono" id="kpiTotalReqs">0</div>
+                <div class="kpi-footer">
+                    <span class="text-success">Thành công: <b id="kpiSuccessReqs" class="mono">0</b></span>
+                    <span class="text-danger" id="kpiFailedBox" style="margin-left: 8px;">Lỗi: <b id="kpiFailedReqs" class="mono">0</b></span>
+                </div>
+            </div>
+
+            <!-- CARD 3: LATENCY -->
+            <div class="kpi-card violet">
+                <div class="kpi-header">
+                    <span class="kpi-title">RESPONSE LATENCY</span>
+                    <span class="kpi-icon">⏱️</span>
+                </div>
+                <div class="kpi-value mono"><span id="kpiAvgLatency">0.0</span><small>ms</small></div>
+                <div class="kpi-footer">
+                    <span>Min: <b id="kpiMinLatency" class="mono">0</b>ms | P95: <b id="kpiP95Latency" class="mono">0.0</b>ms</span>
+                </div>
+            </div>
+
+            <!-- CARD 4: ACTIVE CONNS -->
+            <div class="kpi-card amber">
+                <div class="kpi-header">
+                    <span class="kpi-title">ACTIVE CONNECTIONS</span>
+                    <span class="kpi-icon">🔄</span>
+                </div>
+                <div class="kpi-value mono" id="kpiActiveConns">0</div>
+                <div class="kpi-footer">
+                    <span>Kết nối socket đang mở đồng thời</span>
+                </div>
+            </div>
+
+            <!-- CARD 5: OS THREADS -->
+            <div class="kpi-card rose">
+                <div class="kpi-header">
+                    <span class="kpi-title">OS NATIVE THREADS</span>
+                    <span class="kpi-icon">🧵</span>
+                </div>
+                <div class="kpi-value mono" id="kpiLiveThreads">0</div>
+                <div class="kpi-footer">
+                    <span>Đỉnh luồng OS: <b id="kpiPeakThreads" class="mono">0</b></span>
+                </div>
+            </div>
+
+            <!-- CARD 6: HARDWARE (CPU & RAM) -->
+            <div class="kpi-card blue">
+                <div class="kpi-header">
+                    <span class="kpi-title">JVM HEAP & CPU</span>
+                    <span class="kpi-icon">💻</span>
+                </div>
+                <div class="kpi-value mono"><span id="kpiCpuUsage">0.0</span><small>% CPU</small></div>
+                <div class="kpi-footer">
+                    <span>RAM Heap: <b id="kpiRamUsage" class="mono">0</b>MB / <span id="kpiRamMax" class="mono">0</span>MB</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHARTS SECTION -->
+        <main class="charts-grid">
+            <!-- CHART 1: RPS -->
+            <div class="chart-panel">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-color-box cyan"></span>
+                        Thông Lượng Thời Gian Thực (Requests Per Second)
+                    </div>
+                    <span class="chart-legend mono" id="legendRps">0.0 RPS</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="canvasRps"></canvas>
+                </div>
+            </div>
+
+            <!-- CHART 2: LATENCY -->
+            <div class="chart-panel">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-color-box violet"></span>
+                        Độ Trễ Phản Hồi Trung Bình (Latency ms)
+                    </div>
+                    <span class="chart-legend mono" id="legendLatency">0.0 ms</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="canvasLatency"></canvas>
+                </div>
+            </div>
+
+            <!-- CHART 3: CONCURRENCY VS OS THREADS (KEY ARCHITECTURE COMPARISON) -->
+            <div class="chart-panel">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-color-box emerald"></span>
+                        Active Connections vs
+                        <span class="chart-color-box rose" style="margin-left: 6px;"></span>
+                        OS Platform Threads
+                    </div>
+                    <span class="chart-legend mono" id="legendThreads">Conns: 0 | Threads: 0</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="canvasThreads"></canvas>
+                </div>
+            </div>
+
+            <!-- CHART 4: CPU & MEMORY -->
+            <div class="chart-panel">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span class="chart-color-box blue"></span>
+                        Tiêu Hao CPU (%) & JVM Heap RAM (MB)
+                    </div>
+                    <span class="chart-legend mono" id="legendHardware">CPU: 0% | RAM: 0MB</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="canvasHardware"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <!-- LIVE DEMO & TEST CONTROL CENTER -->
+        <section class="control-center">
+            <div class="control-header">
+                <h3>🎮 DEMO CONTROL CENTER: BẮN TẢI THỬ NGHIỆM TRỰC TIẾP TRÊN TRÌNH DUYỆT</h3>
+                <span class="control-tip">Click các nút dưới đây để kích hoạt request đồng thời và quan sát đồ thị nhảy tức thì!</span>
+            </div>
+
+            <div class="buttons-bar">
+                <button class="btn btn-outline" onclick="triggerRequest('/api/hello', 1)">
+                    <span class="btn-icon">🟢</span> GET /api/hello (1 req - Pure I/O)
+                </button>
+                <button class="btn btn-outline" onclick="triggerRequest('/api/delay?ms=150', 1)">
+                    <span class="btn-icon">🟡</span> GET /api/delay?ms=150 (1 req - I/O Bound)
+                </button>
+                <button class="btn btn-outline" onclick="triggerRequest('/api/compute?n=32', 1)">
+                    <span class="btn-icon">🔴</span> GET /api/compute?n=32 (1 req - CPU Bound)
+                </button>
+                <button class="btn btn-primary" onclick="triggerBurst('/api/delay?ms=100', 30)">
+                    <span class="btn-icon">⚡</span> Burst 30 Reqs (Delay 100ms)
+                </button>
+                <button class="btn btn-danger" onclick="triggerBurst('/api/delay?ms=150', 100)">
+                    <span class="btn-icon">🚀</span> Spike 100 Reqs Đồng Thời!
+                </button>
+                <button class="btn btn-subtle" onclick="clearLogConsole()">
+                    🧹 Xóa Log
+                </button>
+            </div>
+
+            <!-- REAL-TIME CONSOLE OUTPUT -->
+            <div class="console-box">
+                <div class="console-header">
+                    <span>📡 NHẬT KÝ PHẢN HỒI MẠNG (LIVE NETWORK LOG):</span>
+                    <span id="consoleStatus" class="mono text-muted">Sẵn sàng</span>
+                </div>
+                <div class="console-body mono" id="consoleBody">
+                    <div class="log-line info">[*] Dashboard kết nối thành công tới máy chủ T45.</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/dashboard.js"></script>
+</body>
+</html>

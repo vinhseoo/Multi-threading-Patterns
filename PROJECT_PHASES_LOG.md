@@ -2,7 +2,7 @@
 **Đề tài T45:** Multi-threading Patterns in Network Programming  
 **Môn học:** Lập Trình Mạng (PTIT)  
 **Thời gian cập nhật:** 24/09/2026  
-**Trạng thái chung:** 🟢 Đang thực hiện (2/5 Phases hoàn thành - 40%)
+**Trạng thái chung:** 🟢 Đang thực hiện (3/5 Phases hoàn thành - 60%)
 
 ---
 
@@ -12,7 +12,7 @@
 | :---: | :--- | :---: | :---: |
 | **Phase 1** | Nền tảng cốt lõi & HTTP Protocol Engine | ✅ Hoàn thành | 100% |
 | **Phase 2** | Bộ 3 Mô hình Đa luồng & Custom Thread Pool | ✅ Hoàn thành | 100% |
-| **Phase 3** | Hệ thống Đo lường (Metrics) & Real-time Web Dashboard | ⏳ Chưa bắt đầu | 0% |
+| **Phase 3** | Hệ thống Đo lường (Metrics) & Real-time Web Dashboard | ✅ Hoàn thành | 100% |
 | **Phase 4** | Công cụ Benchmark & Kịch bản Bắn tải Thực nghiệm | ⏳ Chưa bắt đầu | 0% |
 | **Phase 5** | Tài liệu Báo cáo, Kịch bản Demo 5.5 phút & Bộ Q&A Thầy Hùng | ⏳ Chưa bắt đầu | 0% |
 
@@ -70,22 +70,22 @@
 ### 🔹 PHASE 3: Hệ Thống Đo Lường (Metrics) & Real-time Web Dashboard
 > **Mục tiêu:** Xây dựng cơ chế thu thập metrics không khóa (Lock-free) và giao diện Web Dashboard trực quan theo dõi tức thời trạng thái CPU, RAM, RPS, Latency khi bắn tải.
 
-- [ ] **3.1. Engine thu thập chỉ số hiệu năng (`metrics`)**
-  - [ ] Tạo `ServerMetrics.java`: Dùng `LongAdder` và `AtomicLong` đếm Total Requests, Requests/sec (RPS), Active Threads, Error Count, Latency (Min, Max, Avg, P95).
-  - [ ] Tạo `SystemMetrics.java`: Dùng `OperatingSystemMXBean` và `MemoryMXBean` đo CPU usage %, JVM Heap RAM, Non-Heap RAM, OS Threads count.
-- [ ] **3.2. Bổ sung các API kịch bản thực nghiệm**
-  - [ ] `GET /api/hello`: Network I/O thuần túy đo thông lượng trần.
-  - [ ] `GET /api/delay?ms=...`: Giả lập I/O-bound (chờ I/O, database, microservice).
-  - [ ] `GET /api/compute?n=...`: Giả lập CPU-bound (tính toán đệ quy Fibonacci nặng).
-  - [ ] `GET /api/metrics`: Xuất toàn bộ dữ liệu thống kê dạng JSON cho Dashboard.
-  - [ ] `GET /dashboard`: Trả về giao diện web dashboard.
-- [ ] **3.3. Xây dựng Real-time Web Dashboard (`src/main/resources/web/`)**
-  - [ ] `index.html`: Bố cục Dashboard phong cách Dark-tech hiện đại, các thẻ chỉ số (KPI cards) và khu vực biểu đồ.
-  - [ ] `style.css`: Thiết kế giao diện cao cấp, dark mode, hiệu ứng chuyển động mượt mà, responsive.
-  - [ ] `dashboard.js`: Tự động gửi request đến `/api/metrics` mỗi 500ms, vẽ biểu đồ thời gian thực (RPS, Latency, Threads, RAM, CPU).
-- [ ] **3.4. Kiểm thử Phase 3**
-  - [ ] Mở trình duyệt `http://localhost:8080/dashboard` kiểm tra đồ thị nhảy mượt mà.
-  - [ ] Kiểm tra các endpoint `/api/compute` và `/api/delay` phản hồi chính xác.
+- [x] **3.1. Engine thu thập chỉ số hiệu năng (`metrics`)**
+  - [x] Tạo `ServerMetrics.java`: Dùng `LongAdder` và `AtomicLong` đếm Total Requests, Requests/sec (RPS), Active Threads, Error Count, Latency (Min, Max, Avg, P95).
+  - [x] Tạo `SystemMetrics.java`: Dùng `OperatingSystemMXBean` và `MemoryMXBean` đo CPU usage %, JVM Heap RAM, Non-Heap RAM, OS Threads count.
+- [x] **3.2. Bổ sung các API kịch bản thực nghiệm**
+  - [x] `GET /api/hello`: Network I/O thuần túy đo thông lượng trần.
+  - [x] `GET /api/delay?ms=...`: Giả lập I/O-bound (chờ I/O, database, microservice).
+  - [x] `GET /api/compute?n=...`: Giả lập CPU-bound (tính toán đệ quy Fibonacci nặng).
+  - [x] `GET /api/metrics`: Xuất toàn bộ dữ liệu thống kê dạng JSON cho Dashboard.
+  - [x] `GET /dashboard`: Trả về giao diện web dashboard.
+- [x] **3.3. Xây dựng Real-time Web Dashboard (`src/main/resources/web/`)**
+  - [x] `index.html`: Bố cục Dashboard phong cách Dark-tech hiện đại, các thẻ chỉ số (KPI cards) và khu vực biểu đồ.
+  - [x] `style.css`: Thiết kế giao diện cao cấp, dark mode, hiệu ứng chuyển động mượt mà, responsive.
+  - [x] `dashboard.js`: Tự động gửi request đến `/api/metrics` mỗi 500ms, vẽ 4 biểu đồ Canvas thời gian thực (RPS, Latency, Concurrency vs OS Threads, CPU & RAM), tích hợp Live Demo Control Center.
+- [x] **3.4. Kiểm thử Phase 3**
+  - [x] Mở trình duyệt `http://localhost:8080/dashboard` kiểm tra đồ thị và tài nguyên phản hồi 200 OK.
+  - [x] Kiểm tra endpoint `/api/metrics` xuất đầy đủ thông số runtime của Mode, Server và System.
 
 ---
 

@@ -1,13 +1,24 @@
 package vn.ptit.network.http;
 
+import lombok.Setter;
+import vn.ptit.network.metrics.SystemMetrics;
+import vn.ptit.network.server.BaseHttpServer;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 /**
  * Bộ định tuyến (Router) và xử lý logic nghiệp vụ cho các yêu cầu HTTP.
- * Hỗ trợ các kịch bản thực nghiệm: I/O thuần, giả lập I/O-bound (delay), CPU-bound (compute).
+ * Hỗ trợ các kịch bản thực nghiệm: I/O thuần, giả lập I/O-bound (delay), CPU-bound (compute),
+ * cung cấp API số liệu hiệu năng /api/metrics và Web Dashboard thời gian thực.
  */
 public class HttpHandler {
+
+    @Setter
+    private BaseHttpServer server;
 
     public HttpResponse handle(HttpRequest request) {
         String path = request.getPath();
@@ -22,7 +33,8 @@ public class HttpHandler {
             switch (path) {
                 case "/":
                 case "/index.html":
-                    return handleRoot();
+                case "/dashboard":
+                    return handleDashboard();
 
                 case "/api/hello":
                     return handleHello(request);
@@ -33,11 +45,11 @@ public class HttpHandler {
                 case "/api/compute":
                     return handleCompute(request);
 
-                case "/dashboard":
-                    return handleDashboard();
+                case "/api/metrics":
+                    return handleMetrics();
 
                 default:
-                    // Thử đọc static resource từ classpath nếu có
+                    // Thử đọc static resource từ classpath hoặc file system
                     HttpResponse staticRes = tryServeStaticResource(path);
                     if (staticRes != null) {
                         return staticRes;
@@ -50,30 +62,6 @@ public class HttpHandler {
         } catch (Exception e) {
             return HttpResponse.internalServerError("Internal error: " + e.getMessage());
         }
-    }
-
-    private HttpResponse handleRoot() {
-        String html = "<!DOCTYPE html>\n" +
-                "<html lang=\"vi\">\n" +
-                "<head><meta charset=\"UTF-8\"><title>T45 Network Server - PTIT</title>\n" +
-                "<style>body{font-family:system-ui,sans-serif;background:#0f172a;color:#f8fafc;padding:40px;line-height:1.6}\n" +
-                ".card{max-width:700px;margin:0 auto;background:#1e293b;border-radius:12px;padding:32px;box-shadow:0 10px 25px rgba(0,0,0,0.5);border:1px solid #334155}\n" +
-                "h1{color:#38bdf8;margin-top:0;}a{color:#38bdf8;text-decoration:none}a:hover{text-decoration:underline}\n" +
-                ".badge{background:#0284c7;color:#fff;padding:4px 10px;border-radius:6px;font-size:14px;font-weight:bold}\n" +
-                "</style></head>\n" +
-                "<body><div class=\"card\">\n" +
-                "<h1>🚀 Đề Tài T45: Multi-Threading Patterns</h1>\n" +
-                "<p><span class=\"badge\">PTIT Network Programming</span> Giảng viên: <b>TS. Đặng Ngọc Hùng</b></p>\n" +
-                "<p>Máy chủ mạng đa luồng đã khởi chạy thành công!</p>\n" +
-                "<h3>Các Endpoint kiểm thử có sẵn:</h3>\n" +
-                "<ul>\n" +
-                "  <li><a href=\"/api/hello\"><code>GET /api/hello</code></a> - Kiểm tra thông lượng socket thuần túy</li>\n" +
-                "  <li><a href=\"/api/delay?ms=150\"><code>GET /api/delay?ms=150</code></a> - Giả lập I/O-bound (database/microservice)</li>\n" +
-                "  <li><a href=\"/api/compute?n=32\"><code>GET /api/compute?n=32</code></a> - Giả lập CPU-bound (Fibonacci đệ quy)</li>\n" +
-                "  <li><a href=\"/dashboard\"><code>GET /dashboard</code></a> - Real-time Web Dashboard (Phase 3)</li>\n" +
-                "</ul>\n" +
-                "</div></body></html>";
-        return HttpResponse.okHtml(html);
     }
 
     private HttpResponse handleHello(HttpRequest request) {
@@ -90,7 +78,6 @@ public class HttpHandler {
 
     private HttpResponse handleDelay(HttpRequest request) throws InterruptedException {
         int ms = request.getIntQueryParam("ms", 100);
-        // Khống chế thời gian sleep an toàn tối đa 10 giây
         if (ms < 0) ms = 0;
         if (ms > 10000) ms = 10000;
 
@@ -110,7 +97,6 @@ public class HttpHandler {
 
     private HttpResponse handleCompute(HttpRequest request) {
         int n = request.getIntQueryParam("n", 30);
-        // Khống chế Fibonacci n <= 42 để tránh tràn stack/treo server quá lâu
         if (n < 0) n = 0;
         if (n > 42) n = 42;
 
@@ -128,37 +114,74 @@ public class HttpHandler {
         return HttpResponse.okJson(json);
     }
 
+    private HttpResponse handleMetrics() {
+        int modeNum = (server != null) ? server.getModeNumber() : 1;
+        String modeName = (server != null) ? server.getModeName() : "Unknown Mode";
+        String serverMetricsJson = (server != null) ? server.getMetrics().toJson() : "{}";
+        String systemMetricsJson = SystemMetrics.toJson();
+
+        String json = String.format(
+                "{\"mode\":{\"number\":%d,\"name\":\"%s\"},\"server\":%s,\"system\":%s}",
+                modeNum, modeName, serverMetricsJson, systemMetricsJson
+        );
+        return HttpResponse.okJson(json);
+    }
+
     private HttpResponse handleDashboard() {
-        HttpResponse res = tryServeStaticResource("/web/index.html");
+        HttpResponse res = tryServeStaticResource("web/index.html");
         if (res != null) return res;
-        return handleRoot();
+        res = tryServeStaticResource("index.html");
+        if (res != null) return res;
+
+        // Fallback HTML nếu chưa nạp file tĩnh
+        return HttpResponse.okHtml("<h1>T45 Server Running</h1><p>Vui lòng kiểm tra file static tại src/main/resources/web/index.html</p>");
     }
 
     private HttpResponse tryServeStaticResource(String resourcePath) {
-        String path = resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath;
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream(path)) {
-            if (in == null) return null;
+        String cleanPath = resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath;
+        if (cleanPath.equals("style.css")) cleanPath = "web/style.css";
+        if (cleanPath.equals("dashboard.js")) cleanPath = "web/dashboard.js";
+        if (cleanPath.equals("index.html")) cleanPath = "web/index.html";
 
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            byte[] data = new byte[4096];
-            int nRead;
-            while ((nRead = in.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
+        byte[] bytes = null;
+
+        // 1. Thử đọc từ ClassLoader
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(cleanPath)) {
+            if (in != null) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                byte[] data = new byte[4096];
+                int nRead;
+                while ((nRead = in.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                bytes = buffer.toByteArray();
             }
-            byte[] bytes = buffer.toByteArray();
+        } catch (Exception ignored) {}
 
-            String contentType = "text/plain";
-            if (path.endsWith(".html")) contentType = "text/html; charset=utf-8";
-            else if (path.endsWith(".css")) contentType = "text/css; charset=utf-8";
-            else if (path.endsWith(".js")) contentType = "application/javascript; charset=utf-8";
-            else if (path.endsWith(".json")) contentType = "application/json; charset=utf-8";
-            else if (path.endsWith(".png")) contentType = "image/png";
-            else if (path.endsWith(".svg")) contentType = "image/svg+xml";
-
-            return new HttpResponse(200, "OK").setBodyBytes(bytes, contentType);
-        } catch (Exception e) {
-            return null;
+        // 2. Thử đọc từ thư mục src/main/resources hoặc target/classes trực tiếp
+        if (bytes == null) {
+            File directFile = new File("src/main/resources/" + cleanPath);
+            if (!directFile.exists()) {
+                directFile = new File("target/classes/" + cleanPath);
+            }
+            if (directFile.exists() && directFile.isFile()) {
+                try {
+                    bytes = Files.readAllBytes(directFile.toPath());
+                } catch (Exception ignored) {}
+            }
         }
+
+        if (bytes == null) return null;
+
+        String contentType = "text/plain";
+        if (cleanPath.endsWith(".html")) contentType = "text/html; charset=utf-8";
+        else if (cleanPath.endsWith(".css")) contentType = "text/css; charset=utf-8";
+        else if (cleanPath.endsWith(".js")) contentType = "application/javascript; charset=utf-8";
+        else if (cleanPath.endsWith(".json")) contentType = "application/json; charset=utf-8";
+        else if (cleanPath.endsWith(".png")) contentType = "image/png";
+        else if (cleanPath.endsWith(".svg")) contentType = "image/svg+xml";
+
+        return new HttpResponse(200, "OK").setBodyBytes(bytes, contentType);
     }
 
     /**
