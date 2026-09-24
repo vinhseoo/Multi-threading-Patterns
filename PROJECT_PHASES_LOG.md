@@ -2,7 +2,7 @@
 **Đề tài T45:** Multi-threading Patterns in Network Programming  
 **Môn học:** Lập Trình Mạng (PTIT)  
 **Thời gian cập nhật:** 24/09/2026  
-**Trạng thái chung:** 🟢 Đang thực hiện (1/5 Phases hoàn thành - 20%)
+**Trạng thái chung:** 🟢 Đang thực hiện (2/5 Phases hoàn thành - 40%)
 
 ---
 
@@ -11,7 +11,7 @@
 | Phase | Tên giai đoạn | Trạng thái | Tỉ lệ hoàn thành |
 | :---: | :--- | :---: | :---: |
 | **Phase 1** | Nền tảng cốt lõi & HTTP Protocol Engine | ✅ Hoàn thành | 100% |
-| **Phase 2** | Bộ 3 Mô hình Đa luồng & Custom Thread Pool | ⏳ Chưa bắt đầu | 0% |
+| **Phase 2** | Bộ 3 Mô hình Đa luồng & Custom Thread Pool | ✅ Hoàn thành | 100% |
 | **Phase 3** | Hệ thống Đo lường (Metrics) & Real-time Web Dashboard | ⏳ Chưa bắt đầu | 0% |
 | **Phase 4** | Công cụ Benchmark & Kịch bản Bắn tải Thực nghiệm | ⏳ Chưa bắt đầu | 0% |
 | **Phase 5** | Tài liệu Báo cáo, Kịch bản Demo 5.5 phút & Bộ Q&A Thầy Hùng | ⏳ Chưa bắt đầu | 0% |
@@ -45,24 +45,25 @@
 ### 🔹 PHASE 2: Bộ 3 Mô Hình Đa Luồng & Custom Thread Pool
 > **Mục tiêu:** Cài đặt đầy đủ 3 mô hình xử lý song song, trong đó có phần tự viết Thread Pool từ con số 0 để lấy trọn 30% điểm Technical Depth.
 
-- [ ] **2.1. Mô hình Thread-per-Connection (`server/ThreadPerConnServer.java`)**
-  - [ ] Cài đặt **Mode 2**: Khởi tạo 1 OS Thread mới cho mỗi kết nối client vào (`new Thread(...).start()`).
-  - [ ] Quản lý đóng Socket an toàn, ghi nhận log luồng.
-- [ ] **2.2. Tự lập trình Custom Thread Pool (`pool/`)**
-  - [ ] Tạo `CustomWorker.java`: Luồng thợ tự lập trình lấy task từ hàng đợi và thực thi.
-  - [ ] Tạo `CustomThreadPool.java`: Tự cài đặt cơ chế Producer-Consumer với Bounded Blocking Queue, worker pool size và hàm graceful shutdown.
-- [ ] **2.3. Mô hình Worker Thread Pool chuẩn doanh nghiệp (`server/WorkerThreadPoolServer.java`)**
-  - [ ] Cài đặt **Mode 3**: Tích hợp `ThreadPoolExecutor` của Java Concurrency.
-  - [ ] Cấu hình Bounded ArrayBlockingQueue.
-  - [ ] Cài đặt cơ chế Backpressure / Rejection Policy (`AbortPolicy` trả về 503 hoặc `CallerRunsPolicy`).
-- [ ] **2.4. Mô hình hiện đại Java 21 Virtual Threads (`server/VirtualThreadServer.java`)**
-  - [ ] Cài đặt **Mode 4**: Sử dụng `Executors.newVirtualThreadPerTaskExecutor()`.
-  - [ ] Xử lý non-blocking mounting/unmounting ngầm định từ JVM Project Loom.
-- [ ] **2.5. Điểm vào ứng dụng (`Main.java`)**
-  - [ ] Menu tương tác Console cho phép người dùng chọn Mode (1, 2, 3, 4) hoặc truyền argument khi khởi động.
-- [ ] **2.6. Kiểm thử Phase 2**
-  - [ ] Khởi động và kiểm tra hoạt động độc lập của cả 4 mode.
-  - [ ] Kiểm tra cơ chế đóng kết nối an toàn (Graceful Shutdown).
+- [x] **2.1. Mô hình Thread-per-Connection (`server/ThreadPerConnServer.java`)**
+  - [x] Cài đặt **Mode 2**: Khởi tạo 1 OS Thread mới cho mỗi kết nối client vào (`new Thread(...).start()`).
+  - [x] Quản lý đóng Socket an toàn, ghi nhận log luồng.
+- [x] **2.2. Tự lập trình Custom Thread Pool (`pool/`)**
+  - [x] Tạo `CustomWorker.java`: Luồng thợ tự lập trình lấy task từ hàng đợi và thực thi.
+  - [x] Tạo `CustomThreadPool.java`: Tự cài đặt cơ chế Producer-Consumer với Bounded Blocking Queue, worker pool size và hàm graceful shutdown.
+  - [x] Tạo `CustomThreadPoolServer.java` (**Mode 5**): Máy chủ chạy trên Custom Thread Pool tự viết để kiểm chứng thực nghiệm.
+- [x] **2.3. Mô hình Worker Thread Pool chuẩn doanh nghiệp (`server/WorkerThreadPoolServer.java`)**
+  - [x] Cài đặt **Mode 3**: Tích hợp `ThreadPoolExecutor` của Java Concurrency.
+  - [x] Cấu hình Bounded ArrayBlockingQueue.
+  - [x] Cài đặt cơ chế Backpressure / Rejection Policy (`AbortPolicy` trả về HTTP 503 Service Unavailable kèm Retry-After).
+- [x] **2.4. Mô hình hiện đại Java 21 Virtual Threads (`server/VirtualThreadServer.java`)**
+  - [x] Cài đặt **Mode 4**: Sử dụng `Executors.newVirtualThreadPerTaskExecutor()`.
+  - [x] Xử lý non-blocking mounting/unmounting ngầm định từ JVM Project Loom (`isVirtual: true`).
+- [x] **2.5. Điểm vào ứng dụng (`Main.java`)**
+  - [x] Menu tương tác Console cho phép người dùng chọn Mode (1, 2, 3, 4, 5) hoặc truyền argument khi khởi động.
+- [x] **2.6. Kiểm thử Phase 2**
+  - [x] Khởi động và kiểm tra hoạt động độc lập của cả 5 mode (Mode 1, Mode 2, Mode 3, Mode 4, Mode 5).
+  - [x] Kiểm tra cơ chế đóng kết nối an toàn (Graceful Shutdown) và giải phóng Socket.
 
 ---
 
