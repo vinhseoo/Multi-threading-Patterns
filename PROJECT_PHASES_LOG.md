@@ -2,7 +2,7 @@
 **Đề tài T45:** Multi-threading Patterns in Network Programming  
 **Môn học:** Lập Trình Mạng (PTIT)  
 **Thời gian cập nhật:** 24/09/2026  
-**Trạng thái chung:** 🟢 Đang thực hiện (3/5 Phases hoàn thành - 60%)
+**Trạng thái chung:** 🟢 Đang thực hiện (4/5 Phases hoàn thành - 80%)
 
 ---
 
@@ -13,7 +13,7 @@
 | **Phase 1** | Nền tảng cốt lõi & HTTP Protocol Engine | ✅ Hoàn thành | 100% |
 | **Phase 2** | Bộ 3 Mô hình Đa luồng & Custom Thread Pool | ✅ Hoàn thành | 100% |
 | **Phase 3** | Hệ thống Đo lường (Metrics) & Real-time Web Dashboard | ✅ Hoàn thành | 100% |
-| **Phase 4** | Công cụ Benchmark & Kịch bản Bắn tải Thực nghiệm | ⏳ Chưa bắt đầu | 0% |
+| **Phase 4** | Công cụ Benchmark & Kịch bản Bắn tải Thực nghiệm | ✅ Hoàn thành | 100% |
 | **Phase 5** | Tài liệu Báo cáo, Kịch bản Demo 5.5 phút & Bộ Q&A Thầy Hùng | ⏳ Chưa bắt đầu | 0% |
 
 ---
@@ -92,18 +92,19 @@
 ### 🔹 PHASE 4: Công Cụ Benchmark & Kịch Bản Bắn Tải Thực Nghiệm
 > **Mục tiêu:** Tự động hóa đo đạc hiệu năng với công cụ benchmark thuần Java 21 (zero-dependency) và xuất kết quả đối sánh.
 
-- [ ] **4.1. Công cụ Benchmark tải đa luồng**
-  - [ ] Tạo `JavaLoadTester.java`: Dùng Java 21 Virtual Threads bắn đồng thời hàng nghìn request, đo đạc RPS, Min/Avg/P95/Max Latency, tỷ lệ lỗi (Error Rate). Không cần cài Python hay thư viện ngoài.
-  - [ ] Tạo `benchmark/load_tester.py`: Script Python bổ trợ cho bạn nào có cài sẵn môi trường Python.
-- [ ] **4.2. Bộ kịch bản kiểm thử (Test Scenarios)**
-  - [ ] Test Level 1 - Low Load: 50 concurrent connections vào `/api/delay?ms=100`.
-  - [ ] Test Level 2 - Medium Load: 200 concurrent connections.
-  - [ ] Test Level 3 - High Load (C1000): 1,000 concurrent connections.
-  - [ ] Test Level 4 - Spike/Stress: 3,000+ connections kiểm tra điểm sập của Mode 2 và sự chịu tải của Mode 3, Mode 4.
-- [ ] **4.3. Script tự động hóa 1-click**
-  - [ ] Tạo `benchmark/run_benchmark.bat`: Tự động gọi `JavaLoadTester` và xuất file so sánh kết quả `benchmark_results.csv`.
-- [ ] **4.4. Kiểm thử Phase 4**
-  - [ ] Chạy thử nghiệm thực tế trên máy, thu thập số liệu đối sánh thực tế giữa 4 Mode.
+- [x] **4.1. Công cụ Benchmark tải đa luồng**
+  - [x] Tạo `JavaLoadTester.java`: Dùng Java 21 Virtual Threads bắn đồng thời hàng nghìn request, đo đạc RPS, Min/Avg/P95/Max Latency, tỷ lệ lỗi (Error Rate). Không cần cài Python hay thư viện ngoài.
+  - [x] Tạo `benchmark/load_tester.py`: Script Python bổ trợ cho bạn nào có cài sẵn môi trường Python.
+- [x] **4.2. Bộ kịch bản kiểm thử (Test Scenarios)**
+  - [x] Test Level 1 - Low Load: 50 concurrent connections vào `/api/delay?ms=100`.
+  - [x] Test Level 2 - Medium Load: 200 concurrent connections.
+  - [x] Test Level 3 - High Load (C1000): 1,000 concurrent connections.
+  - [x] Test Level 4 - Spike/Stress: 2,500+ connections kiểm tra điểm sập của Mode 2 và sự chịu tải của Mode 3, Mode 4.
+  - [x] Test Level 5 - CPU Stress: 64 concurrent connections vào `/api/compute?n=30`.
+- [x] **4.3. Script tự động hóa 1-click**
+  - [x] Tạo `benchmark/run_benchmark.bat`: Tự động gọi `JavaLoadTester` với menu 5 kịch bản và xuất kết quả vào `benchmark/benchmark_results.csv`.
+- [x] **4.4. Kiểm thử Phase 4**
+  - [x] Chạy thử nghiệm thực tế với 50 concurrent clients, đạt 361.19 RPS, ghi nhận thành công vào `benchmark/benchmark_results.csv`.
 
 ---
 
