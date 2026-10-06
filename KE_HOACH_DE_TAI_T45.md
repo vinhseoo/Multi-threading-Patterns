@@ -29,20 +29,20 @@ Khi làm 1 mình, giảng viên sẽ đánh giá rất cao tinh thần tự ch�
 
 ---
 
-## 2. BỐN (04) MÔ HÌNH LUỒNG ĐỐI ĐẦU TRONG DỰ ÁN
+## 2. NĂM (05) MÔ HÌNH LUỒNG ĐỐI ĐẦU TRONG DỰ ÁN
 
-Hệ thống sẽ cài đặt và cho phép chuyển đổi 4 mô hình luồng trên cùng 1 server:
+Hệ thống cài đặt và cho phép chuyển đổi 5 mô hình luồng trên cùng 1 máy chủ:
 
 ```
                                   [ Incoming Client Connections ]
                                                 │
-                 ┌──────────────────────────────┼──────────────────────────────┐
-                 ▼                              ▼                              ▼                              ▼
-      [ Mode 1: Iterative ]           [ Mode 2: Thread-Per-Conn ]     [ Mode 3: Worker Thread Pool ]  [ Mode 4: Virtual Threads ]
-       - 1 Main Thread                 - 1 Acceptor Thread             - 1 Acceptor Thread             - 1 Acceptor Thread
-       - Xử lý tuần tự từng client     - Spawns new thread/client      - Bounded Blocking Queue        - Java 21 Loom Virtual Threads
-       - Block hoàn toàn kết nối sau   - Dễ crash khi C1000+           - Fixed pool (N workers)        - 100K+ lightweight threads
-       - Đo độ trễ xếp hàng            - Đo chi phí Context Switch     - Đo cơ chế Backpressure        - Đỉnh cao hiệu năng I/O
+         ┌──────────────────────────────┼──────────────────────────────┬──────────────────────────────┐
+         ▼                              ▼                              ▼                              ▼                              ▼
+[ Mode 1: Iterative ]          [ Mode 2: Thread-Per-Conn ]    [ Mode 3: Worker Thread Pool ] [ Mode 5: Custom Pool ]        [ Mode 4: Virtual Threads ]
+ - 1 Main Thread                - 1 Acceptor Thread            - 1 Acceptor Thread            - 1 Acceptor Thread            - 1 Acceptor Thread
+ - Xử lý tuần tự từng client    - Spawns new thread/client     - ArrayBlockingQueue           - Custom Circular Queue        - Java 21 Loom Virtual Threads
+ - Block hoàn toàn kết nối sau  - Dễ crash khi C1000+          - Fixed pool (16 workers)      - 16 Workers (tự viết 100%)    - 100K+ lightweight threads
+ - Đo độ trễ xếp hàng           - Đo chi phí Context Switch    - Đo cơ chế Backpressure       - Monitor Pattern (wait/notify)- Đỉnh cao hiệu năng I/O
 ```
 
 ### Chi Tiết Kỹ Thuật Từng Mô Hình:
@@ -75,6 +75,13 @@ Hệ thống sẽ cài đặt và cho phép chuyển đổi 4 mô hình luồng 
 - **Chính sách từ chối (Rejection Policies):**
   - Khi hàng đợi đầy: Sử dụng `AbortPolicy` (trả về HTTP 503 Service Unavailable) để tự bảo vệ hệ thống không bị crash, hoặc `CallerRunsPolicy` để tạo cơ chế **Backpressure (áp lực ngược)** tự nhiên làm chậm tốc độ nhận kết nối.
 
+#### Mô Hình 5: Custom Thread Pool Server (Tự cài đặt 100% không dùng thư viện ngoài - 30% Điểm Kỹ Thuật)
+- **Cơ chế:**
+  - `CustomBlockingQueue<T>`: Hàng đợi chặn Bounded Circular Buffer $O(1)$ tự cài đặt bằng mảng vòng, đồng bộ Monitor nguyên bản (`synchronized`, `wait()`, `notifyAll()`). Hoàn toàn không dùng bất kỳ class nào từ `java.util.concurrent.*`.
+  - `CustomWorker`: Luồng thợ kế thừa trực tiếp từ `Thread`, chạy vòng lặp `while (running || !taskQueue.isEmpty())`.
+  - `CustomThreadPool`: Quản lý 16 workers, Rejection policy (503 Service Unavailable) và Graceful shutdown.
+- **Vai trò trong bài:** Chứng minh hiểu sâu sắc cấu trúc dữ liệu tầng thấp, làm chủ mẫu Producer-Consumer và lấy trọn 30% điểm Technical Depth.
+
 #### Mô Hình 4: Modern Concurrency — Java 21 Virtual Threads (Project Loom)
 - **Cơ chế:**
   ```java
@@ -99,25 +106,28 @@ NetworkProgramming-T45/
 ├── README.md                                  # Hướng dẫn build, run và kịch bản demo
 ├── docs/
 │   ├── presentation-outline.md                # Đề cương slide 15 phút
-│   └── demo-script.md                         # Kịch bản demo bấm giờ từng phút
+│   ├── demo-script.md                         # Kịch bản demo bấm giờ từng phút
+│   └── qa-defense-guide.md                    # Cẩm nang 7 câu hỏi phản biện tầng sâu
 ├── benchmark/
 │   ├── load_tester.py                         # Tool bắn tải đa luồng đo RPS & Latency
-│   └── run_benchmark.bat                      # Script tự động chạy lần lượt 4 mode & ghi CSV
+│   └── run_benchmark.bat                      # Script tự động chạy lần lượt 5 mode & ghi CSV
 └── src/
     ├── main/
-    │   ├── java/vn/ptit/network/
-    │   │   ├── Main.java                      # Điểm khởi động, cho phép chọn Mode (1, 2, 3, 4)
-    │   │   ├── config/
-    │   │   │   └── ServerConfig.java          # Cấu hình Port, Pool Size, Queue Capacity
-    │   │   ├── server/
-    │   │   │   ├── BaseHttpServer.java        # Lớp trừu tượng quản lý Socket Server chung
-    │   │   │   ├── IterativeServer.java       # Mode 1: Single Thread
-    │   │   │   ├── ThreadPerConnServer.java   # Mode 2: Thread-per-connection
-    │   │   │   ├── WorkerThreadPoolServer.java# Mode 3: Thread Pool + Bounded Queue
-    │   │   │   └── VirtualThreadServer.java   # Mode 4: Java 21 Virtual Threads
-    │   │   ├── pool/
-    │   │   │   ├── CustomThreadPool.java      # Tự viết ThreadPool (Worker + BlockingQueue)
-    │   │   │   └── CustomWorker.java          # Luồng thợ tự lập trình
+        ├── java/vn/ptit/network/
+        │   ├── Main.java                      # Điểm khởi động, cho phép chọn Mode (1, 2, 3, 4, 5)
+        │   ├── config/
+        │   │   └── ServerConfig.java          # Cấu hình Port, Pool Size, Queue Capacity
+        │   ├── server/
+        │   │   ├── BaseHttpServer.java        # Lớp trừu tượng quản lý Socket Server chung
+        │   │   ├── IterativeServer.java       # Mode 1: Single Thread
+        │   │   ├── ThreadPerConnServer.java   # Mode 2: Thread-per-connection
+        │   │   ├── WorkerThreadPoolServer.java# Mode 3: Thread Pool + Bounded Queue
+        │   │   ├── VirtualThreadServer.java   # Mode 4: Java 21 Virtual Threads
+        │   │   └── CustomThreadPoolServer.java# Mode 5: Custom Thread Pool tự viết
+        │   ├── pool/
+        │   │   ├── CustomBlockingQueue.java   # Hàng đợi chặn Bounded Circular Buffer O(1) tự code
+        │   │   ├── CustomThreadPool.java      # Tự viết ThreadPool (Worker + BlockingQueue)
+        │   │   └── CustomWorker.java          # Luồng thợ tự lập trình
     │   │   ├── http/
     │   │   │   ├── HttpRequest.java           # Parser HTTP/1.1 (Method, Path, Headers)
     │   │   │   ├── HttpResponse.java          # Builder HTTP Response chuẩn (Status, Content-Type)

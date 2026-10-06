@@ -48,7 +48,8 @@
 - [x] **2.1. Mô hình Thread-per-Connection (`server/ThreadPerConnServer.java`)**
   - [x] Cài đặt **Mode 2**: Khởi tạo 1 OS Thread mới cho mỗi kết nối client vào (`new Thread(...).start()`).
   - [x] Quản lý đóng Socket an toàn, ghi nhận log luồng.
-- [x] **2.2. Tự lập trình Custom Thread Pool (`pool/`)**
+- [x] **2.2. Tự lập trình Custom Thread Pool & Bounded Queue (`pool/`)**
+  - [x] Tạo `CustomBlockingQueue.java`: Hàng đợi chặn Bounded Circular Buffer $O(1)$ tự cài đặt bằng `synchronized`, `wait()`, `notifyAll()` không dùng thư viện ngoài.
   - [x] Tạo `CustomWorker.java`: Luồng thợ tự lập trình lấy task từ hàng đợi và thực thi.
   - [x] Tạo `CustomThreadPool.java`: Tự cài đặt cơ chế Producer-Consumer với Bounded Blocking Queue, worker pool size và hàm graceful shutdown.
   - [x] Tạo `CustomThreadPoolServer.java` (**Mode 5**): Máy chủ chạy trên Custom Thread Pool tự viết để kiểm chứng thực nghiệm.

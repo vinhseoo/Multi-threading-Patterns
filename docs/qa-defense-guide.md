@@ -83,11 +83,14 @@
 ### ❓ CÂU HỎI 5: "Tại sao em phải tự viết Custom Thread Pool mà không dùng ThreadPoolExecutor có sẵn của Java?"
 
 #### 🎯 Luận điểm trả lời chuẩn xác:
-> "Thưa thầy, việc dùng thư viện có sẵn `ThreadPoolExecutor` thì rất nhanh và chuẩn doanh nghiệp (em đã cài đặt ở Mode 3). Nhưng để đạt điểm xuất sắc về **Technical Depth (30% điểm bài tập lớn)** và thể hiện trình độ sinh viên PTIT, em đã tự viết class `CustomThreadPool` và `CustomWorker` từ con số 0 (ở Mode 5) nhằm chứng minh:
-> 1. Em hiểu sâu sắc mẫu thiết kế **Producer - Consumer**.
-> 2. Em làm chủ cơ chế luồng thợ sống lâu (**Long-lived Worker Thread**): Dùng vòng lặp `while (running || !taskQueue.isEmpty())` để tái sử dụng luồng, tránh chi phí cấp phát và hủy luồng liên tục của hệ điều hành.
-> 3. Em nắm vững cơ chế đồng bộ hóa với Hàng đợi chặn (**BlockingQueue**) và xử lý ngoại lệ an toàn khi Graceful Shutdown.  
-> Khi so sánh thực nghiệm trên công cụ Benchmark, `CustomThreadPool` của em chạy ổn định tương đương với `ThreadPoolExecutor` chuẩn của Java."
+> "Thưa thầy, việc dùng thư viện có sẵn `ThreadPoolExecutor` thì rất nhanh và chuẩn doanh nghiệp (em đã cài đặt ở Mode 3). Nhưng để đạt điểm xuất sắc về **Technical Depth (30% điểm bài tập lớn)** và thể hiện trình độ sinh viên PTIT, em đã tự viết class `CustomThreadPool`, `CustomWorker` và đặc biệt là `CustomBlockingQueue` từ con số 0 (ở Mode 5) mà **hoàn toàn không dùng bất kỳ class nào trong `java.util.concurrent.*`** nhằm chứng minh:
+> 1. **Tự cài đặt Hàng đợi chặn có giới hạn (Bounded Circular Blocking Queue):**  
+>    Em sử dụng cấu trúc **mảng vòng (Circular Array)** với 2 con trỏ `putIndex` và `takeIndex` đạt độ phức tạp $O(1)$ cho cả enqueue và dequeue. Đồng bộ hóa đa luồng thuần túy bằng Java Monitor Pattern nguyên bản: `synchronized`, `wait()` và `notifyAll()`.
+> 2. **Cơ chế luồng thợ sống lâu (Long-lived Worker Thread):**  
+>    Class `CustomWorker` kế thừa trực tiếp từ `Thread`, chạy vòng lặp `while (running || !taskQueue.isEmpty())` liên tục gọi `take()` từ hàng đợi dùng chung để tái sử dụng luồng, triệt tiêu hoàn toàn chi phí khởi tạo và hủy luồng liên tục của hệ điều hành.
+> 3. **Cơ chế chống sập hệ thống (Bounded Capacity & Rejection):**  
+>    Phương thức `offer(task)` là Non-blocking: nếu mảng vòng đầy 1,000 tasks, nó lập tức trả về `false` để máy chủ ném `RejectedExecutionException` và phản hồi HTTP 503 cho client, không bao giờ để tràn bộ nhớ RAM (OOM).  
+> Khi đối sánh thực nghiệm trên Web Dashboard, `CustomThreadPool` của em chạy ổn định với thông lượng ~148.6 RPS, tương đương với `ThreadPoolExecutor` chuẩn của Oracle."
 
 ---
 
@@ -99,3 +102,18 @@
 > 2. Các client kết nối sau sẽ bị giữ trạng thái kết nối thành công ở tầng Transport (ESTABLISHED), nhưng ở tầng Application thì chúng phải nằm chờ trong hàng đợi OS Backlog vì tiến trình Java mới chỉ có 1 luồng đơn chưa kịp gọi tới hàm `accept()`.
 > 3. Nếu số lượng client gửi đến vượt quá dung lượng hàng đợi Backlog của hệ điều hành, OS sẽ từ chối tiếp nhận và client sẽ nhận ngay lỗi mạng `Connection Refused` hoặc `Connection Timed Out`.
 > Đây chính là hạn chế chí mạng của mô hình Single-Threaded mà đồ án của em đã chứng minh bằng số liệu thực nghiệm."
+
+---
+
+### ❓ CÂU HỎI 7: "Trong CustomBlockingQueue tự viết, tại sao em lại dùng notifyAll() mà không dùng notify()?"
+
+#### 🎯 Luận điểm trả lời chuẩn xác:
+> "Thưa thầy, đây là một cạm bẫy kinh điển về **Mất tín hiệu thức dậy (Lost Wakeup / Lost Signal)** trong mô hình Java Monitor:
+> 1. Trong `CustomBlockingQueue`, chúng ta có 2 nhóm luồng cùng ngủ chung trên một Monitor (chung một Wait-set):
+>    - Nhóm **Producer** (Acceptor Thread): Đang chờ khi hàng đợi đầy (ở hàm `put()`).
+>    - Nhóm **Consumer** (16 CustomWorker Threads): Đang chờ khi hàng đợi rỗng (ở hàm `take()`).
+> 2. Nếu em chỉ gọi `notify()`, JVM chỉ đánh thức ngẫu nhiên **DUY NHẤT 1 luồng** trong Wait-set:
+>    - Giả sử một Consumer vừa rút task và gọi `notify()` với ý định đánh thức một Producer đang chờ hàng đầy.
+>    - Nhưng JVM lại xui rủi đánh thức một Consumer khác! Consumer này thức dậy thấy queue vẫn rỗng nên lại ngủ tiếp (`wait()`).
+>    - Hậu quả: Producer không được đánh thức, không có task mới nào được đẩy vào, toàn bộ hệ thống rơi vào trạng thái **Tắc nghẽn vô hạn (Deadlock / Thread Starvation)**!
+> 3. Bằng cách gọi `notifyAll()`, em đảm bảo mọi luồng (cả Producer và Consumer) đều được đánh thức để kiểm tra lại điều kiện trong vòng lặp `while (condition)`. Luồng nào thỏa mãn điều kiện sẽ tiếp tục chạy an toàn."

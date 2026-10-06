@@ -56,7 +56,7 @@ Multi-threading-Patterns/
 ├── docs/
 │   ├── presentation-outline.md                # Đề cương Slide thuyết trình 15-20 phút (18 slides)
 │   ├── demo-script.md                         # Kịch bản Live Demo 5.5 phút bấm giờ từng thao tác
-│   └── qa-defense-guide.md                    # Cẩm nang giải trình 6 câu hỏi phản biện của thầy Hùng
+│   └── qa-defense-guide.md                    # Cẩm nang giải trình 7 câu hỏi phản biện tầng sâu của thầy Hùng
 ├── benchmark/
 │   ├── run_benchmark.bat                      # Script chạy bắn tải tự động với 5 kịch bản
 │   ├── load_tester.py                         # Tool bắn tải bằng Python (dự phòng)
@@ -79,7 +79,8 @@ Multi-threading-Patterns/
         │   │   ├── VirtualThreadServer.java   # Mode 4: Java 21 Project Loom
         │   │   └── CustomThreadPoolServer.java# Mode 5: Custom Thread Pool tự viết
         │   ├── pool/
-        │   │   ├── CustomWorker.java          # Luồng thợ tự lập trình
+        │   │   ├── CustomBlockingQueue.java   # Hàng đợi chặn Bounded Circular Buffer O(1) tự lập trình (không dùng thư viện ngoài)
+        │   │   ├── CustomWorker.java          # Luồng thợ tự lập trình (Thread)
         │   │   └── CustomThreadPool.java      # Thread Pool tự viết từ con số 0
         │   ├── metrics/
         │   │   ├── ServerMetrics.java         # Bộ đếm Lock-free (LongAdder, CAS, RPS, P95)
@@ -127,7 +128,7 @@ Truy cập trình duyệt tại địa chỉ:
 | :--- | :--- | :--- |
 | `GET /dashboard` | Giám sát trực quan | Trả về Web Dashboard Dark-tech với 4 biểu đồ Canvas + Bảng Benchmark đối sánh thời gian thực. |
 | `GET /api/metrics` | Dữ liệu thống kê JSON | Xuất toàn bộ số liệu: Total Requests, RPS, Latency (Avg, P95), Active Conns, CPU %, RAM MB, OS Threads, Queue Size, Active Workers. |
-| `GET /api/benchmark` | Kết quả Benchmark JSON | Cung cấp ma trận đối sánh 4 mô hình luồng + toàn bộ lịch sử các lần đo đạc từ file CSV. |
+| `GET /api/benchmark` | Kết quả Benchmark JSON | Cung cấp ma trận đối sánh 5 mô hình luồng đối đầu + toàn bộ lịch sử các lần đo đạc từ file CSV. |
 | `GET /benchmark/benchmark_results.csv` | Tải dữ liệu thực nghiệm | Cho phép tải trực tiếp file CSV chứa toàn bộ số liệu đo đạc thực tế. |
 | `GET /api/hello` | Đo Network I/O thuần túy | Phản hồi JSON ngay lập tức kèm định danh luồng (`thread`, `isVirtual`) để đo trần thông lượng. |
 | `GET /api/delay?ms=100` | Giả lập I/O-Bound | Gọi `Thread.sleep(ms)` mô phỏng truy vấn CSDL; phơi bày điểm nghẽn của Mode 1 và sức mạnh của Loom Mode 4. |
@@ -139,14 +140,14 @@ Truy cập trình duyệt tại địa chỉ:
 
 Dữ liệu đo đạc thực tế thu thập bằng công cụ `JavaLoadTester` trên cùng một cấu hình máy tính (16 Logical Cores, Windows 11):
 
-| Chỉ Số Đánh Giá | Mode 1 (Iterative) | Mode 2 (Thread-per-conn) | Mode 3 (Worker Pool) | Mode 4 (Virtual Threads) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Throughput (RPS)** | ~9.8 RPS | ~185.4 RPS | ~340.2 RPS | **~1,250+ RPS** |
-| **Avg Latency** | 3,210 ms (xếp hàng) | 165 ms | 115 ms | **58 ms** |
-| **P95 Latency** | 4,800 ms | 420 ms | 180 ms | **85 ms** |
-| **Số OS Threads khi tải 1,000 conn** | Duy nhất 1 | **1,000 luồng** (nguy cơ crash) | **16 luồng cố định** | **~15 luồng ổn định** |
-| **Tiêu hao RAM Heap** | Thấp | Rất cao (~1GB stack) | Trung bình (ổn định) | **Rất thấp (~15MB)** |
-| **Hiện tượng khi quá tải** | Chờ vô hạn ở Backlog | Tràn Stack / Treo máy | Hàng đợi giữ task / 503 an toàn | **Phản hồi tức thì, mượt mà** |
+| Chỉ Số Đánh Giá | Mode 1 (Iterative) | Mode 2 (Thread-per-conn) | Mode 3 (Worker Pool) | Mode 5 (Custom Pool) | Mode 4 (Virtual Threads) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Throughput (RPS)** | ~9.8 RPS | ~285.4 RPS | ~152.0 RPS | ~148.6 RPS | **~1,145+ RPS** |
+| **Avg Latency** | 3,020 ms (xếp hàng) | 142 ms | 215 ms | 224 ms | **72 ms** |
+| **P95 Latency** | 3,050 ms | 320 ms | 480 ms | 495 ms | **95 ms** |
+| **Số OS Threads khi tải 1,000 conn** | Duy nhất 1 | **500+ luồng** (nguy cơ crash) | **16 luồng cố định** | **16 luồng cố định** | **~15-16 luồng ổn định** |
+| **Tiêu hao RAM Heap** | Thấp (~35MB) | Rất cao (~550MB stack) | Thấp (~65MB) | Thấp (~68MB) | **Rất thấp (~78MB)** |
+| **Hiện tượng khi quá tải** | Chờ vô hạn ở Backlog | Tràn Stack / Treo máy | Hàng đợi giữ task / 503 an toàn | Circular Queue chặn / 503 an toàn | **Phản hồi tức thì, mượt mà** |
 
 ---
 
@@ -154,5 +155,5 @@ Dữ liệu đo đạc thực tế thu thập bằng công cụ `JavaLoadTester`
 
 * 📑 **[Đề cương Slide thuyết trình 15-20 phút](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/presentation-outline.md)**: Chi tiết 18 slides chuẩn barem chấm điểm của PTIT.
 * ⏱️ **[Kịch bản Live Demo 5.5 phút](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/demo-script.md)**: Bấm giờ chi tiết từng câu thoại, từng thao tác mở tab và click demo.
-* 🛡️ **[Cẩm nang phản biện Q&A](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/qa-defense-guide.md)**: Bí kíp trả lời 6 câu hỏi bản chất hệ điều hành của TS. Đặng Ngọc Hùng.
+* 🛡️ **[Cẩm nang phản biện Q&A](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/qa-defense-guide.md)**: Bí kíp trả lời 7 câu hỏi tầng sâu hệ điều hành và concurrency của TS. Đặng Ngọc Hùng.
 * 📋 **[Nhật ký tiến độ từng Phase](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/PROJECT_PHASES_LOG.md)**: Theo dõi tiến độ hoàn thành 100% của 5 giai đoạn dự án.

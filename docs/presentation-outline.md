@@ -9,7 +9,7 @@
 
 ## 🎯 PHÂN BỔ THỜI GIAN THUYẾT TRÌNH (TỔNG: 18 PHÚT)
 * **Phần 1: Đặt vấn đề & Bản chất Hệ điều hành** (00:00 – 04:30 | 4.5 phút)
-* **Phần 2: 4 Kiến trúc luồng & Custom Thread Pool** (04:30 – 09:30 | 5 phút)
+* **Phần 2: 5 Kiến trúc luồng & Custom Thread Pool Tự Lập Trình** (04:30 – 09:30 | 5 phút)
 * **Phần 3: LIVE DEMO TRỰC QUAN TRÊN DASHBOARD** (09:30 – 15:00 | 5.5 phút)
 * **Phần 4: Kết quả thực nghiệm, Kết luận & Q&A** (15:00 – 18:00 | 3 phút)
 
@@ -19,7 +19,7 @@
 
 ### SLIDE 1: Trang Tiêu Đề
 * **Tiêu đề:** ĐỀ TÀI T45: MULTI-THREADING PATTERNS IN NETWORK PROGRAMMING
-* **Phụ đề:** Nghiên Cứu, Cài Đặt Thực Nghiệm 4 Mô Hình Đa Luồng và Ứng Dụng Java 21 Project Loom trong Lập Trình Mạng
+* **Phụ đề:** Nghiên Cứu, Cài Đặt Thực Nghiệm 5 Mô Hình Luồng Đối Đầu và Ứng Dụng Java 21 Project Loom trong Lập Trình Mạng
 * **Thông tin:** Sinh viên thực hiện | Giảng viên hướng dẫn: TS. Đặng Ngọc Hùng | Học viện Công nghệ Bưu chính Viễn thông (PTIT).
 * **Lời nói mở đầu (30s):** "Kính thưa thầy Đặng Ngọc Hùng và các bạn. Trong kỷ nguyên dịch vụ số hiện đại, một máy chủ mạng phải đối mặt với hàng chục nghìn yêu cầu đồng thời mỗi giây. Hôm nay, em xin trình bày đề tài T45..."
 
@@ -61,16 +61,16 @@
 
 ---
 
-### SLIDE 5: Tổng Quan 4 Mô Hình Luồng Trong Dự Án
+### SLIDE 5: Tổng Quan 5 Mô Hình Luồng Trong Dự Án
 * **Sơ đồ kiến trúc tổng thể:**
   ```
-                        [ Incoming Socket Connections ]
-                                       │
-        ┌──────────────┬───────────────┴───────────────┬──────────────┐
-        ▼              ▼                               ▼              ▼
-   [ Mode 1 ]     [ Mode 2 ]                      [ Mode 3 ]     [ Mode 4 ]
-   Iterative      Thread-Per-Conn                 Worker Pool    Virtual Threads
-   (Single)       (OS Threads)                    (Queue + N)    (Java 21 Loom)
+                                [ Incoming Socket Connections ]
+                                               │
+        ┌──────────────┬───────────────┼───────────────┬──────────────┬──────────────┐
+        ▼              ▼               ▼               ▼              ▼              ▼
+   [ Mode 1 ]     [ Mode 2 ]      [ Mode 3 ]      [ Mode 5 ]     [ Mode 4 ]
+   Iterative      Thread-Per-Conn Worker Pool     Custom Pool    Virtual Threads
+   (Single)       (OS Threads)    (JDK Exec)      (Self-made)    (Java 21 Loom)
   ```
 
 ---
@@ -108,11 +108,16 @@
 
 ---
 
-### SLIDE 10: [INNOVATION] Custom Thread Pool Tự Lập Trình (Technical Depth 30%)
-* **Mục tiêu:** Không dựa dẫm vào `java.util.concurrent.ThreadPoolExecutor`, tự cài đặt từ con số 0:
-  * `CustomWorker.java`: Luồng thợ sống lâu (Long-lived Thread) chạy vòng lặp vô tận `taskQueue.take()`.
-  * `CustomThreadPool.java`: Tự cài đặt cơ chế đồng bộ luồng, quản lý danh sách Worker và Graceful Shutdown.
-* **Giá trị khoa học:** Chứng minh hiểu sâu sắc cấu trúc dữ liệu Producer-Consumer tầng thấp.
+### SLIDE 10: [INNOVATION 30%] Custom Thread Pool & Bounded Queue Tự Lập Trình
+* **Mục tiêu:** Không dựa dẫm vào bất kỳ class nào trong `java.util.concurrent.*`, tự xây dựng 100% từ đầu:
+  * **`CustomBlockingQueue.java`**: Hàng đợi chặn Bounded Circular Buffer $O(1)$ tự code:
+    - Mảng vòng tròn (`Object[] items`, `putIndex`, `takeIndex`, `count`).
+    - Monitor Pattern với `synchronized`, `wait()` và `notifyAll()`.
+    - Non-blocking `offer()`: Khi đầy 1,000 tasks trả về `false` ngay để kích hoạt HTTP 503 Rejection.
+    - Blocking `take()`: Worker tự động `wait()` ngủ đông khi hàng đợi rỗng.
+  * **`CustomWorker.java`**: Luồng thợ sống lâu kế thừa trực tiếp từ `Thread`, chạy vòng lặp vô tận tiêu thụ task.
+  * **`CustomThreadPool.java`**: Quản lý danh sách 16 Workers, Graceful Shutdown và đo lường active count.
+* **Giá trị khoa học:** Chứng minh năng lực làm chủ cấu trúc dữ liệu Producer-Consumer và đồng bộ hóa tầng thấp.
 
 ---
 
@@ -131,20 +136,21 @@
 
 ---
 
-### SLIDE 12: Bảng Đối Sánh Lý Thuyết 4 Kiến Trúc
-| Tiêu chí | Mode 1 (Iterative) | Mode 2 (Thread-per-conn) | Mode 3 (Worker Pool) | Mode 4 (Virtual Threads) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Số luồng OS** | Duy nhất 1 | Bằng số Client ($N$) | Cố định ($16-32$) | Rất ít (~$N_{cores}$) |
-| **Bộ nhớ Stack/luồng** | 1MB | 1MB / kết nối | 1MB $\times$ CorePool | Vài trăm Bytes (Heap) |
-| **Context Switch** | Không có | Cực kỳ nghiêm trọng | Thấp, kiểm soát được | Siêu nhẹ (JVM-managed) |
-| **Giới hạn kết nối** | $C \approx 1$ | $C \approx 1,000-2,000$ | $C \approx Queue + Workers$ | **$C > 100,000$** |
+### SLIDE 12: Bảng Đối Sánh Lý Thuyết 5 Kiến Trúc Luồng
+| Tiêu chí | Mode 1 (Iterative) | Mode 2 (Thread-per-conn) | Mode 3 (Worker Pool) | Mode 5 (Custom Pool) | Mode 4 (Virtual Threads) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Số luồng OS** | Duy nhất 1 | Bằng số Client ($N$) | Cố định ($16-32$) | Cố định ($16-32$) | Rất ít (~$N_{cores}$) |
+| **Bộ nhớ Stack/luồng** | 1MB | 1MB / kết nối | 1MB $\times$ CorePool | 1MB $\times$ CorePool | Vài trăm Bytes (Heap) |
+| **Hàng đợi Blocking** | Không có | Không có | `ArrayBlockingQueue` | `CustomBlockingQueue` (Circular) | VirtualThread Scheduler |
+| **Context Switch** | Không có | Cực kỳ nghiêm trọng | Thấp, kiểm soát được | Thấp, kiểm soát được | Siêu nhẹ (JVM-managed) |
+| **Giới hạn kết nối** | $C \approx 1$ | $C \approx 1,000-2,000$ | $C \approx Queue + Workers$ | $C \approx Queue + Workers$ | **$C > 100,000$** |
 
 ---
 
 ### SLIDE 13: Hệ Thống Đo Lường Lock-Free & Real-Time Dashboard
 * **Lock-free Metrics Engine:** Sử dụng `LongAdder`, `AtomicLong` (lệnh vi xử lý CPU CAS) – không gây nghẽn tại điểm đếm.
 * **JMX Hardware Monitor:** Giám sát % CPU, RAM Heap, và số luồng OS Native Threads thực tế.
-* **Giao diện Web Dashboard:** 4 biểu đồ Canvas thời gian thực cập nhật chu kỳ 500ms.
+* **Giao diện Web Dashboard:** 4 biểu đồ Canvas thời gian thực cập nhật chu kỳ 500ms + Bảng đối sánh Benchmark đa luồng + Hỗ trợ Sắp xếp lịch sử test linh hoạt.
 
 ---
 
@@ -152,18 +158,21 @@
 *(Chuyển sang màn hình trình duyệt `http://localhost:8080/dashboard` - Xem chi tiết trong file `demo-script.md`)*
 * Bước 1: Giới thiệu Dashboard & baseline tài nguyên.
 * Bước 2: Đối chứng Single-thread vs Đa luồng qua `/api/delay`.
-* Bước 3: Thử thách tải cao C1000 và cơ chế hàng đợi Mode 3.
+* Bước 3: Thử thách tải cao C1000 và kiểm soát tài nguyên Mode 3.
+* Bước 3.5: Trình diễn Mode 5 tự lập trình và mở mã nguồn `CustomBlockingQueue.java`.
 * Bước 4: Đỉnh cao Virtual Threads xử lý nghìn kết nối mà OS Threads vẫn phẳng lì.
+* Bước 5: Phân tích bảng ma trận đối sánh và sắp xếp lịch sử kiểm thử.
 
 ---
 
 ### SLIDE 15: Kết Quả Đo Đạc Thực Nghiệm (Benchmark Data)
 *(Trình chiếu số liệu thực tế thu thập được từ `JavaLoadTester` và file `benchmark_results.csv`)*
 * Biểu đồ so sánh Throughput (RPS):
-  * Mode 1: ~9.8 RPS (bị nghẽn delay tuần tự).
-  * Mode 2: ~180 RPS (suy hao do context switch).
-  * Mode 3: ~320 RPS (hàng đợi điều tiết ổn định).
-  * **Mode 4: ~1,250+ RPS (Virtual Threads bứt phá vượt trội)**.
+  * Mode 1: ~9.8 RPS (bị nghẽn delay tuần tự ở TCP Backlog).
+  * Mode 2: ~285.4 RPS (suy hao do context switch và bộ nhớ stack).
+  * Mode 3: ~152.0 RPS (hàng đợi Bounded Queue điều tiết ổn định).
+  * Mode 5: ~148.6 RPS (Custom Pool tự viết mảng vòng đạt hiệu năng ngang ngửa Mode 3 chuẩn).
+  * **Mode 4: ~1,145+ RPS (Virtual Threads bứt phá vượt trội)**.
 
 ---
 

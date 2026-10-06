@@ -32,6 +32,7 @@
 | **Mode 2**<br>Thread-per-Conn | `.\run_server.bat 2` | `Mode 2: Thread-per-Conn...`<br>*(Đỏ: 1 Thread Per Socket)* | `⚡ Burst 30 Reqs (Delay 100ms)`<br>Hoặc `🚀 Spike 100 Reqs` | - **RPS:** Vọt lên 250 - 280 RPS<br>- **Latency:** Xong ngay trong **110ms - 130ms**!<br>- **OS Threads:** **Tăng vọt thêm 30 - 100 luồng!** | **Đường Xanh (Conns) và Đường Đỏ (Threads) DÍNH CHẶT VÀO NHAU cùng nhảy vọt lên đỉnh!** | Bắn ra đồng loạt 30 dòng cùng lúc:<br>`[✓] HTTP 200 trong 115ms [Thread: ThreadPerConn-1]`<br>`[Thread: ThreadPerConn-2]...` |
 | **Mode 3**<br>Worker Thread Pool | `.\run_server.bat 3` | `Mode 3: Worker Thread Pool...`<br>*(Vàng: Queue: 0/1000 \| Workers: 16/16)* | Click nút cam:<br>**`🔥 Benchmark 500 Clients`**<br>*(Hoặc Terminal: run_benchmark.bat)* | - **RPS:** Ổn định ~150 RPS<br>- **Latency:** ~210ms (16 worker chia 2 đợt)<br>- **OS Threads:** **BỊ KHÓA CỨNG Ở 16 LUỒNG!** | **Đường Xanh (Conns)** vọt lên 500,<br>nhưng **Đường Đỏ (Threads)** bị **chặn trần tuyệt đối ở mức 16 luồng**! | Các worker luân phiên tiêu thụ task:<br>`[Thread: WorkerPool-1]`<br>`[Thread: WorkerPool-2]...` |
 | **Mode 4**<br>Java 21 Virtual Threads | `.\run_server.bat 4` | `Mode 4: Java 21 Virtual Threads...`<br>*(Xanh ngọc: OS Carrier Threads: 16)* | `🚀 Spike 100 Reqs`<br>Hoặc Benchmark 1,000 clients | - **RPS:** **Vọt lên 1,100+ RPS**<br>- **Latency:** Siêu tốc **70ms - 90ms**<br>- **OS Threads:** **HOÀN TOÀN PHẲNG LÌ Ở 15-16 LUỒNG!** | **Đường Xanh (Conns) vọt lên đỉnh chót vót (1,000 conns)**,<br>trong khi **Đường Đỏ (OS Threads) NẰM NGANG PHẲNG LÌ** dưới đáy! | In ra hàng loạt luồng ảo siêu nhẹ:<br>`[✓] HTTP 200 trong 72ms [Thread: VirtualThread-1] [Loom Virtual]` |
+| **Mode 5**<br>Custom Thread Pool *(30% Depth)* | `.\run_server.bat 5` | `Mode 5: Custom Thread Pool...`<br>*(Tím: Queue: 0/1000 \| Workers: 16/16)* | `⚡ Burst 30 Reqs`<br>Hoặc `🔥 Benchmark 500 Clients` | - **RPS:** Ổn định ~148 RPS<br>- **Latency:** ~220ms<br>- **OS Threads:** **BỊ KHÓA CỨNG Ở 16 LUỒNG!** | **Đường Xanh vọt lên, Đường Đỏ chặn cứng ở 16 luồng** (giống Mode 3 nhưng tự viết 100% bằng mảng vòng + wait/notify). | Các worker tự lập trình tiêu thụ task:<br>`[Thread: CustomWorker-1]`<br>`[Thread: CustomWorker-2]...` |
 
 ---
 
@@ -157,7 +158,37 @@
 
 ---
 
-### 📍 PHÂN CẢNH 4: ĐỈNH CAO JAVA 21 PROJECT LOOM VIRTUAL THREADS (03:45 – 05:00)
+### 📍 PHÂN CẢNH 3.5: [INNOVATION 30%] CHỨNG MINH ĐỘ SÂU KỸ THUẬT VỚI CUSTOM THREAD POOL & BOUNDED QUEUE (MODE 5) (03:45 – 04:30)
+
+#### 1. Thao tác kỹ thuật:
+- Tại Terminal 1, bấm `Ctrl + C`, khởi động **Mode 5** (Chế độ tự lập trình 100% không dùng thư viện ngoài):
+  ```powershell
+  .\run_server.bat 5
+  ```
+- Quan sát Header Dashboard: Hiển thị badge màu tím:
+  `Mode 5: Custom Thread Pool Server (Self-implemented Pool)`  
+  `📦 Queue: 0/1000 | Workers: 0/16`
+- Tại mục **🎮 DEMO CONTROL CENTER**, click nút:
+  `⚡ Burst 30 Reqs (Delay 100ms)` hoặc `🔥 Benchmark 500 Clients`
+
+#### 2. Hiện tượng và điểm nhấn kỹ thuật cần chỉ cho thầy xem:
+1. **Log Console:** Tên luồng in ra chính xác tên các worker tự tạo:
+   `[Thread: CustomWorker-1]`, `[Thread: CustomWorker-2]`... `[Thread: CustomWorker-16]`.
+2. **Biểu đồ số 3:** Tương tự Mode 3 chuẩn, số luồng OS Native Threads bị **khống chế cứng ở 16 luồng**.
+3. **Mở file code trực tiếp cho thầy xem (Chốt trọn 30% điểm Technical Depth):**
+   - Mở file [CustomBlockingQueue.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomBlockingQueue.java): Chỉ cho thầy thấy cấu trúc **Mảng vòng (Circular Array Buffer)** đạt độ phức tạp $O(1)$, cùng cặp hàm nguyên bản `synchronized`, `wait()` và `notifyAll()`.
+   - Mở file [CustomWorker.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomWorker.java): Chỉ cho thầy thấy luồng kế thừa trực tiếp từ `Thread`, chạy vòng lặp rút task từ hàng đợi tự viết.
+
+#### 3. Lời thoại trình bày:
+> *"Thưa thầy, để đạt điểm tuyệt đối về Technical Depth, ở **Mode 5**, em đã tự tay xây dựng toàn bộ hệ thống Thread Pool từ con số 0 mà không dùng bất kỳ lớp nào trong `java.util.concurrent`.*  
+> *- Em tự cài đặt `CustomBlockingQueue` bằng mảng vòng (Circular Array) $O(1)$, áp dụng Java Monitor Pattern với `synchronized`, `wait()` và `notifyAll()`.*  
+> *- Khi hàng đợi đầy 1,000 tasks, hàm `offer()` trả về `false` ngay (Non-blocking) để trả về mã lỗi HTTP 503 tự bảo vệ hệ thống.*  
+> *- 16 `CustomWorker` kế thừa trực tiếp từ `Thread` liên tục gọi `take()` và tự động ngủ đông khi không có task để giải phóng CPU.*  
+> *Kết quả đo đạc trên Dashboard cho thấy Mode 5 tự viết đạt hiệu năng và độ ổn định tương đương hoàn toàn với `ThreadPoolExecutor` chuẩn của Oracle."*
+
+---
+
+### 📍 PHÂN CẢNH 4: ĐỈNH CAO JAVA 21 PROJECT LOOM VIRTUAL THREADS (04:30 – 05:30)
 
 #### 1. Thao tác kỹ thuật:
 - Tại Terminal 1, chuyển sang **Mode 4**:
@@ -195,12 +226,13 @@
 
 ---
 
-### 📍 PHÂN CẢNH 5: BẢNG ĐỐI SÁNH BENCHMARK TRỰC TIẾP TRÊN DASHBOARD & KẾT LUẬN (05:00 – 05:30)
+### 📍 PHÂN CẢNH 5: BẢNG ĐỐI SÁNH BENCHMARK TRỰC TIẾP TRÊN DASHBOARD & KẾT LUẬN (05:30 – 06:00)
 
 #### 1. Thao tác kỹ thuật:
-- Cuộn chuột xuống ngay bên dưới 4 biểu đồ Canvas tới mục:  
-  **📊 BẢNG ĐỐI SÁNH HIỆU NĂNG THỰC NGHIỆM (4 MÔ HÌNH LUỒNG)**.
+- Cuộn chuột xuống ngay bên dưới Demo Control Center tới mục:  
+  **📊 BẢNG ĐỐI SÁNH HIỆU NĂNG THỰC NGHIỆM (5 MÔ HÌNH LUỒNG ĐỐI ĐẦU)**.
 - Nhấp nút **`🔄 Làm Mới Dữ Liệu`** (Dashboard tự động gọi `/api/benchmark` và hiển thị kết quả).
+- Chỉ cho thầy thấy tính năng **Sắp xếp thời gian (Sort Mới nhất trước ▼)** và khả năng click vào bất kỳ cột nào để đối sánh trực tiếp.
 
 #### 2. Chỉ vào các phần tử trực quan trên màn hình Benchmark:
 1. **Bảng Ma Trận Đối Sánh Tổng Hợp (Benchmark Matrix Table):**
@@ -208,7 +240,7 @@
    - Chỉ vào hàng **Mode 2 (Thread-per-Connection)**: RPS 285.4, OS Threads 500+ luồng, RAM 550MB -> Điểm nghẽn Context Switching và nguy cơ OOM Crash.
    - Chỉ vào hàng **Mode 3 (Worker Thread Pool)**: RPS 152.0, OS Threads 16 luồng cố định, RAM 65MB -> An toàn, ổn định với Bounded Queue.
    - Chỉ vào hàng **Mode 4 (Virtual Threads Loom)**: RPS 1,145.2, P95 95ms, OS Threads 15-16 luồng phẳng -> Đỉnh cao thông lượng.
-   - Chỉ vào hàng **Mode 5 (Custom Thread Pool)**: Mô hình tự viết BlockingQueue và Worker từ đầu để chứng minh hiểu sâu internals.
+   - Chỉ vào hàng **Mode 5 (Custom Thread Pool)**: Mô hình tự viết BlockingQueue và Worker từ đầu (RPS ~148.6, P95 ~495ms) để chứng minh hiểu sâu internals.
 2. **Hai Thanh Đồ Thị Đối Sánh Cột (Visual Bars):**
    - Thanh màu xanh ngọc (Mode 4) chiếm ưu thế áp đảo về Throughput (1,145 RPS).
    - Thanh độ trễ P95 của Mode 4 ngắn nhất (chỉ 95ms so với 3,050ms của Mode 1).
@@ -218,7 +250,7 @@
 
 #### 3. Lời thoại kết luận và chuyển sang phần Q&A:
 > *"Thưa thầy, toàn bộ các số liệu đo đạc khoa học từ công cụ `JavaLoadTester` đều đã được hiển thị trực quan trên Bảng đối sánh Benchmark của Dashboard và tự động đồng bộ vào file CSV.*  
-> *Đề tài đã hoàn thành xuất sắc mục tiêu: Đối chứng toàn diện 4 mô hình luồng kinh điển và ứng dụng thành công Java 21 Project Loom để giải bài toán nghẽn mạng High-Concurrency.*  
+> *Đề tài đã hoàn thành xuất sắc mục tiêu: Đối chứng toàn diện 5 mô hình luồng (từ tuần tự, đa luồng hệ điều hành, Thread Pool tự viết đến Java 21 Project Loom) để giải bài toán nghẽn mạng High-Concurrency.*  
 > *Phần trình diễn Live Demo của em đến đây là kết thúc. Em xin kính mời thầy Đặng Ngọc Hùng đặt câu hỏi phản biện ạ!"*
 
 ---
@@ -228,6 +260,6 @@
 - **Nếu thầy bảo: "Em đổi cổng server sang 9090 xem sao?":**  
   Chạy ngay: `.\run_server.bat 4 9090` (máy chủ đã hỗ trợ tham số port thứ 2).
 - **Nếu thầy bảo: "Em thử chứng minh cơ chế từ chối tải 503 của Thread Pool xem?":**  
-  Bật Mode 3, dùng terminal bắn tải vượt quá 1,000 tasks trong queue, server sẽ lập tức trả về mã HTTP 503 kèm header `Retry-After: 2` hiển thị trên màn hình.
+  Bật Mode 3 (hoặc Mode 5), dùng terminal bắn tải vượt quá 1,000 tasks trong queue, server sẽ lập tức trả về mã HTTP 503 kèm header `Retry-After: 2` hiển thị trên màn hình.
 - **Nếu thầy bảo: "Em có tự viết Thread Pool không hay chỉ dùng thư viện có sẵn?":**  
-  Bật ngay **Mode 5** (`.\run_server.bat 5`) và mở file [CustomThreadPool.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomThreadPool.java) và [CustomWorker.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomWorker.java) giải thích cơ chế synchronized, wait/notify và volatile. Thầy sẽ chấm điểm A+ ngay lập tức!
+  Bật ngay **Mode 5** (`.\run_server.bat 5`) và mở trực tiếp các file [CustomBlockingQueue.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomBlockingQueue.java), [CustomThreadPool.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomThreadPool.java) và [CustomWorker.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomWorker.java) giải thích cơ chế Mảng vòng O(1), Monitor Pattern `synchronized`, `wait()`, `notifyAll()`. Thầy sẽ chấm trọn điểm A+ ngay lập tức!
