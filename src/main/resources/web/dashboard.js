@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bắt đầu vòng lặp polling metrics mỗi 500ms
     fetchMetrics();
     setInterval(fetchMetrics, 500);
+
+    // Tải dữ liệu đối sánh Benchmark
+    fetchBenchmarkData();
 });
 
 function initCanvases() {
@@ -85,6 +88,37 @@ function updateUI(data) {
     // 1. Cập nhật Badge Mode & Uptime
     if (mode) {
         document.getElementById('modeNameDisplay').textContent = `Mode ${mode.number}: ${mode.name}`;
+
+        const queueBadge = document.getElementById('queueBadgeDisplay');
+        const queueText = document.getElementById('queueTextDisplay');
+        if (queueBadge && queueText) {
+            if (mode.number === 3 || mode.number === 5) {
+                queueBadge.style.display = 'inline-flex';
+                queueBadge.style.background = 'rgba(245, 158, 11, 0.12)';
+                queueBadge.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+                queueBadge.style.color = '#fbbf24';
+                queueText.textContent = `Queue: ${mode.queueSize || 0}/${mode.queueCapacity || 1000} | Workers: ${mode.activeWorkers || 0}/16`;
+            } else if (mode.number === 4) {
+                queueBadge.style.display = 'inline-flex';
+                queueBadge.style.background = 'rgba(16, 185, 129, 0.12)';
+                queueBadge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+                queueBadge.style.color = '#34d399';
+                const liveTh = system ? system.liveThreadCount : 16;
+                queueBadge.innerHTML = `<span class="queue-icon">🧵</span><span>OS Carrier Threads: <b>${liveTh}</b> (M:N Mapping)</span>`;
+            } else if (mode.number === 2) {
+                queueBadge.style.display = 'inline-flex';
+                queueBadge.style.background = 'rgba(244, 63, 94, 0.12)';
+                queueBadge.style.borderColor = 'rgba(244, 63, 94, 0.35)';
+                queueBadge.style.color = '#fb7185';
+                queueBadge.innerHTML = `<span class="queue-icon">⚠️</span><span>1 Thread Per Socket (1MB Stack / Luồng)</span>`;
+            } else {
+                queueBadge.style.display = 'inline-flex';
+                queueBadge.style.background = 'rgba(100, 116, 139, 0.15)';
+                queueBadge.style.borderColor = 'rgba(100, 116, 139, 0.35)';
+                queueBadge.style.color = '#94a3b8';
+                queueBadge.innerHTML = `<span class="queue-icon">⏸️</span><span>Đơn luồng tuần tự (Main Thread duy nhất)</span>`;
+            }
+        }
     }
     if (server && server.uptimeSeconds !== undefined) {
         document.getElementById('uptimeDisplay').textContent = formatSeconds(server.uptimeSeconds);
@@ -331,6 +365,26 @@ async function triggerBurst(endpoint, count = 30) {
     }
 }
 
+async function triggerBackendBenchmark(concurrency = 500, requests = 2000) {
+    logToConsole(`[🚀 KÍCH HOẠT BENCHMARK TIẾN TRÌNH ĐỘC LẬP] Đang phát động tải ${concurrency} Clients đồng thời (${requests} reqs)...`, 'warn');
+    document.getElementById('consoleStatus').textContent = `Đang chạy Benchmark ${concurrency} clients...`;
+
+    try {
+        const res = await fetch(`/api/benchmark/trigger?c=${concurrency}&n=${requests}`);
+        const data = await res.json();
+        logToConsole(`[✓] Đã khởi chạy tiến trình JavaLoadTester: ${data.concurrency} clients đang bắn tải TCP! Quan sát Biểu đồ số 3...`, 'success');
+
+        // Tự động làm mới bảng benchmark sau khi tiến trình độc lập chạy xong
+        setTimeout(() => {
+            fetchBenchmarkData();
+            logToConsole(`[✓] Đợt tải đã hoàn tất! Bảng đối sánh Benchmark đã được cập nhật dữ liệu đo đạc mới.`, 'info');
+            document.getElementById('consoleStatus').textContent = 'Sẵn sàng';
+        }, 15000);
+    } catch (e) {
+        logToConsole(`[✗] Lỗi kích hoạt benchmark: ${e.message}`, 'error');
+    }
+}
+
 function logToConsole(message, type = 'info') {
     const body = document.getElementById('consoleBody');
     if (!body) return;
@@ -356,3 +410,130 @@ function formatSeconds(secs) {
     const s = Math.floor(secs % 60).toString().padStart(2, '0');
     return `${h}:${m}:${s}`;
 }
+
+// ==========================================================================
+// BENCHMARK DATA FETCH & VISUALIZATION ENGINE
+// ==========================================================================
+
+async function fetchBenchmarkData() {
+    try {
+        const res = await fetch('/api/benchmark');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.summary && data.summary.length > 0) {
+            renderBenchmarkMatrix(data.summary);
+            renderBenchmarkBars(data.summary);
+        }
+
+        if (data.history) {
+            renderBenchmarkHistory(data.history);
+        }
+    } catch (e) {
+        console.error("Lỗi lấy dữ liệu benchmark:", e);
+    }
+}
+
+function renderBenchmarkMatrix(summaryList) {
+    const tbody = document.getElementById('benchmarkMatrixBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = summaryList.map(item => {
+        const isLoom = item.mode === 4;
+        const rowClass = isLoom ? 'highlight-loom' : '';
+        const tagColor = item.mode === 4 ? 'tag-emerald' : (item.mode === 3 ? 'tag-amber' : (item.mode === 5 ? 'tag-violet' : (item.mode === 2 ? 'tag-rose' : 'tag-cyan')));
+
+        return `
+            <tr class="${rowClass}">
+                <td><b class="${isLoom ? 'text-success' : ''}">${item.title}</b></td>
+                <td><span class="badge-tag ${tagColor}">${item.category}</span></td>
+                <td><span class="mono" style="font-weight:700; color:${isLoom ? '#34d399' : '#06b6d4'}">${item.rps.toFixed(1)} req/s</span></td>
+                <td><span class="mono" style="font-weight:700; color:${item.p95Latency > 1000 ? '#f87171' : '#a78bfa'}">${item.p95Latency} ms</span></td>
+                <td><span class="mono">${item.threads}</span></td>
+                <td><span class="mono">${item.ramMb} MB</span></td>
+                <td><span class="mono">${item.safeConns.toLocaleString()} conns</span></td>
+                <td style="color:#94a3b8; font-size:12px;">${item.bottleneck}</td>
+                <td><span class="badge-tag ${isLoom ? 'tag-emerald' : (item.mode === 5 ? 'tag-violet' : 'tag-amber')}">${item.status}</span></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderBenchmarkBars(summaryList) {
+    const rpsContainer = document.getElementById('rpsBarsContainer');
+    const latencyContainer = document.getElementById('latencyBarsContainer');
+    if (!rpsContainer || !latencyContainer) return;
+
+    // 1. Throughput RPS Bars
+    const maxRps = Math.max(...summaryList.map(s => s.rps), 100);
+    rpsContainer.innerHTML = summaryList.map(item => {
+        const pct = Math.min(100, Math.max(3, (item.rps / maxRps) * 100));
+        const colorClass = item.mode === 4 ? 'emerald' : (item.mode === 2 ? 'cyan' : (item.mode === 3 ? 'amber' : (item.mode === 5 ? 'violet' : 'rose')));
+        return `
+            <div class="bar-row">
+                <div class="bar-row-info">
+                    <span>${item.title.split(':')[0]} (${item.category})</span>
+                    <span class="mono" style="font-weight:700;">${item.rps.toFixed(1)} RPS</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill ${colorClass}" style="width: ${pct}%;"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // 2. Latency P95 Bars (Càng thấp càng tốt, vẽ tỉ lệ nghịch hoặc vẽ trực tiếp)
+    const maxLatency = Math.max(...summaryList.map(s => s.p95Latency), 100);
+    latencyContainer.innerHTML = summaryList.map(item => {
+        const pct = Math.min(100, Math.max(3, (item.p95Latency / maxLatency) * 100));
+        const colorClass = item.p95Latency > 1000 ? 'rose' : (item.mode === 4 ? 'emerald' : 'violet');
+        return `
+            <div class="bar-row">
+                <div class="bar-row-info">
+                    <span>${item.title.split(':')[0]} (${item.category})</span>
+                    <span class="mono" style="font-weight:700;">${item.p95Latency} ms</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill ${colorClass}" style="width: ${pct}%;"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderBenchmarkHistory(historyList) {
+    const tbody = document.getElementById('csvHistoryBody');
+    const countBadge = document.getElementById('historyCountBadge');
+    if (!tbody) return;
+
+    if (countBadge) {
+        countBadge.textContent = `${historyList.length} bản ghi test`;
+    }
+
+    if (historyList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#64748b; padding:20px;">Chưa có dữ liệu trong benchmark_results.csv</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = historyList.map(row => {
+        const rps = parseFloat(row.rps) || 0;
+        const avg = parseFloat(row.avgLatency) || 0;
+        const p95 = parseFloat(row.p95) || 0;
+        const isLoom = row.mode && row.mode.includes("Mode 4");
+
+        return `
+            <tr class="${isLoom ? 'highlight-loom' : ''}">
+                <td class="mono" style="font-size:11px; color:#94a3b8;">${row.timestamp}</td>
+                <td><b>${row.mode}</b></td>
+                <td class="mono">${row.concurrency}</td>
+                <td class="mono">${row.totalReqs}</td>
+                <td class="mono text-success">${row.successReqs}</td>
+                <td class="mono">${row.totalTimeSec}s</td>
+                <td class="mono" style="font-weight:700; color:${isLoom ? '#34d399' : '#06b6d4'};">${rps.toFixed(2)}</td>
+                <td class="mono">${avg.toFixed(1)}ms</td>
+                <td class="mono" style="font-weight:700; color:${p95 > 1000 ? '#f87171' : '#a78bfa'};">${p95}ms</td>
+            </tr>
+        `;
+    }).join('');
+}
+

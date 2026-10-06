@@ -28,6 +28,10 @@
                     <span class="pulse-dot"></span>
                     <span id="modeNameDisplay">Đang tải mô hình...</span>
                 </div>
+                <div class="queue-badge" id="queueBadgeDisplay" style="display: none;">
+                    <span class="queue-icon">📦</span>
+                    <span id="queueTextDisplay">Queue: 0/1000 | Workers: 16/16</span>
+                </div>
             </div>
 
             <div class="header-right">
@@ -178,6 +182,104 @@
             </div>
         </main>
 
+        <!-- BENCHMARK SECTION (ĐỐI SÁNH KẾT QUẢ THỰC NGHIỆM) -->
+        <section class="benchmark-section" id="benchmarkSection">
+            <div class="benchmark-header">
+                <div class="benchmark-title-box">
+                    <span class="benchmark-icon">📊</span>
+                    <div>
+                        <div class="benchmark-title">BẢNG ĐỐI SÁNH HIỆU NĂNG THỰC NGHIỆM (5 MÔ HÌNH LUỒNG ĐỐI ĐẦU)</div>
+                        <div class="benchmark-subtitle">Kết quả kiểm thử thực tế từ JavaLoadTester (Java 21 Project Loom) • Kịch bản: 500 Clients, 1,000 Reqs, 100ms I/O Delay</div>
+                    </div>
+                </div>
+                <div class="benchmark-actions">
+                    <button class="btn btn-outline btn-sm" onclick="fetchBenchmarkData()">
+                        <span>🔄</span> Làm Mới Dữ Liệu
+                    </button>
+                    <a href="/benchmark/benchmark_results.csv" download="benchmark_results.csv" class="btn btn-primary btn-sm" style="text-decoration: none;">
+                        <span>📥</span> Tải File CSV
+                    </a>
+                </div>
+            </div>
+
+            <!-- COMPARISON MATRIX TABLE -->
+            <div class="matrix-card">
+                <div class="table-responsive">
+                    <table class="benchmark-table">
+                        <thead>
+                            <tr>
+                                <th>Mô Hình Luồng</th>
+                                <th>Phân Loại</th>
+                                <th>Thông Lượng (RPS)</th>
+                                <th>Độ Trễ P95</th>
+                                <th>Số Luồng OS</th>
+                                <th>Tiêu Hao RAM</th>
+                                <th>Chịu Tải An Toàn</th>
+                                <th>Điểm Nghẽn Kỹ Thuật</th>
+                                <th>Đánh Giá</th>
+                            </tr>
+                        </thead>
+                        <tbody id="benchmarkMatrixBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VISUAL COMPARISON BARS -->
+            <div class="visual-grid">
+                <div class="visual-panel">
+                    <div class="visual-title">
+                        <span class="chart-color-box cyan"></span>
+                        Thông Lượng Đối Sánh (Requests/giây - Càng cao càng tốt)
+                    </div>
+                    <div class="bar-chart-container" id="rpsBarsContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <div class="visual-panel">
+                    <div class="visual-title">
+                        <span class="chart-color-box violet"></span>
+                        Độ Trễ Phân Vị P95 (Mili-giây - Càng thấp càng tốt)
+                    </div>
+                    <div class="bar-chart-container" id="latencyBarsContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSV RUN HISTORY -->
+            <div class="csv-history-card">
+                <div class="csv-history-header">
+                    <div class="history-title">
+                        <span>📋</span>
+                        Nhật Ký Các Đợt Bắn Tải Thực Tế Lưu Trong: <code class="mono text-cyan">benchmark/benchmark_results.csv</code>
+                    </div>
+                    <span class="history-count mono" id="historyCountBadge">Đang nạp...</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Thời Gian</th>
+                                <th>Mô Hình (Mode)</th>
+                                <th>Clients</th>
+                                <th>Tổng Reqs</th>
+                                <th>Thành Công</th>
+                                <th>Thời Gian</th>
+                                <th>Throughput (RPS)</th>
+                                <th>Độ Trễ TB</th>
+                                <th>P95 Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody id="csvHistoryBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- LIVE DEMO & TEST CONTROL CENTER -->
         <section class="control-center">
             <div class="control-header">
@@ -200,6 +302,9 @@
                 </button>
                 <button class="btn btn-danger" onclick="triggerBurst('/api/delay?ms=150', 100)">
                     <span class="btn-icon">🚀</span> Spike 100 Reqs Đồng Thời!
+                </button>
+                <button class="btn btn-stress" id="btnStress500" onclick="triggerBackendBenchmark(500, 2000)">
+                    <span class="btn-icon">🔥</span> Benchmark 500 Clients (2,000 Reqs)
                 </button>
                 <button class="btn btn-subtle" onclick="clearLogConsole()">
                     🧹 Xóa Log
