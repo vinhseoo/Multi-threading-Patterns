@@ -598,6 +598,24 @@ canvas {
     white-space: nowrap;
 }
 
+.history-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease-in-out;
+}
+
+.history-table th.sortable:hover {
+    color: #38bdf8;
+    background: #1a243b;
+}
+
+.history-table th.sortable .sort-arrow {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 11px;
+    color: #38bdf8;
+}
+
 .benchmark-table td, .history-table td {
     padding: 12px 14px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);

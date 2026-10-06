@@ -415,6 +415,10 @@ function formatSeconds(secs) {
 // BENCHMARK DATA FETCH & VISUALIZATION ENGINE
 // ==========================================================================
 
+let benchmarkHistoryList = [];
+let historySortField = 'timestamp';
+let historySortAsc = false; // Mặc định: false = Mới nhất trước (Descending)
+
 async function fetchBenchmarkData() {
     try {
         const res = await fetch('/api/benchmark');
@@ -427,10 +431,92 @@ async function fetchBenchmarkData() {
         }
 
         if (data.history) {
-            renderBenchmarkHistory(data.history);
+            benchmarkHistoryList = data.history;
+            applySortAndRenderHistory();
         }
     } catch (e) {
         console.error("Lỗi lấy dữ liệu benchmark:", e);
+    }
+}
+
+/**
+ * Đảo chiều sắp xếp thời gian (Mới nhất <-> Cũ nhất)
+ */
+function toggleTimeSort() {
+    if (historySortField === 'timestamp') {
+        historySortAsc = !historySortAsc;
+    } else {
+        historySortField = 'timestamp';
+        historySortAsc = false;
+    }
+    applySortAndRenderHistory();
+}
+
+/**
+ * Sắp xếp theo một trường bất kỳ khi nhấp vào tiêu đề cột
+ */
+function sortHistory(field) {
+    if (historySortField === field) {
+        historySortAsc = !historySortAsc;
+    } else {
+        historySortField = field;
+        historySortAsc = (field === 'timestamp') ? false : true;
+    }
+    applySortAndRenderHistory();
+}
+
+/**
+ * Thực hiện sắp xếp mảng dữ liệu và cập nhật giao diện
+ */
+function applySortAndRenderHistory() {
+    if (!benchmarkHistoryList || benchmarkHistoryList.length === 0) {
+        renderBenchmarkHistory([]);
+        return;
+    }
+
+    const sorted = [...benchmarkHistoryList].sort((a, b) => {
+        let valA = a[historySortField];
+        let valB = b[historySortField];
+
+        if (historySortField === 'timestamp') {
+            const timeA = new Date(valA).getTime() || valA;
+            const timeB = new Date(valB).getTime() || valB;
+            return historySortAsc ? (timeA > timeB ? 1 : -1) : (timeA < timeB ? 1 : -1);
+        }
+
+        const numA = parseFloat(valA);
+        const numB = parseFloat(valB);
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return historySortAsc ? numA - numB : numB - numA;
+        }
+
+        const strA = (valA || '').toString();
+        const strB = (valB || '').toString();
+        return historySortAsc ? strA.localeCompare(strB) : strB.localeCompare(strA);
+    });
+
+    updateSortIndicators();
+    renderBenchmarkHistory(sorted);
+}
+
+function updateSortIndicators() {
+    const arrow = historySortAsc ? '▲' : '▼';
+    const fields = ['timestamp', 'concurrency', 'totalReqs', 'totalTimeSec', 'rps', 'avgLatency', 'p95'];
+    fields.forEach(f => {
+        const el = document.getElementById(`sortIcon_${f}`);
+        if (el) {
+            el.textContent = (historySortField === f) ? arrow : '↕';
+            el.style.opacity = (historySortField === f) ? '1' : '0.35';
+        }
+    });
+
+    const toggleBtnText = document.getElementById('sortToggleText');
+    if (toggleBtnText) {
+        if (historySortField === 'timestamp') {
+            toggleBtnText.textContent = historySortAsc ? 'Cũ nhất trước ▲' : 'Mới nhất trước ▼';
+        } else {
+            toggleBtnText.textContent = `Sort: ${historySortField} ${arrow}`;
+        }
     }
 }
 
@@ -536,4 +622,5 @@ function renderBenchmarkHistory(historyList) {
         `;
     }).join('');
 }
+
 

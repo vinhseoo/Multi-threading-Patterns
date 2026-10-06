@@ -298,21 +298,40 @@
                         <span>📋</span>
                         Nhật Ký Các Đợt Bắn Tải Thực Tế Lưu Trong: <code class="mono text-cyan">benchmark/benchmark_results.csv</code>
                     </div>
-                    <span class="history-count mono" id="historyCountBadge">Đang nạp...</span>
+                    <div class="history-actions" style="display: flex; align-items: center; gap: 10px;">
+                        <button class="btn btn-outline btn-sm" id="btnSortToggle" onclick="toggleTimeSort()" style="padding: 5px 12px; font-size: 11px;" title="Chuyển đổi sắp xếp theo thời gian">
+                            <span>⏳</span> <span id="sortToggleText">Mới nhất trước ▼</span>
+                        </button>
+                        <span class="history-count mono" id="historyCountBadge">Đang nạp...</span>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="history-table">
                         <thead>
                             <tr>
-                                <th>Thời Gian</th>
-                                <th>Mô Hình (Mode)</th>
-                                <th>Clients</th>
-                                <th>Tổng Reqs</th>
-                                <th>Thành Công</th>
-                                <th>Thời Gian</th>
-                                <th>Throughput (RPS)</th>
-                                <th>Độ Trễ TB</th>
-                                <th>P95 Latency</th>
+                                <th class="sortable" onclick="sortHistory('timestamp')" title="Nhấp để đảo chiều sắp xếp theo thời gian">
+                                    THỜI GIAN <span id="sortIcon_timestamp" class="sort-arrow">▼</span>
+                                </th>
+                                <th>MÔ HÌNH (MODE)</th>
+                                <th class="sortable" onclick="sortHistory('concurrency')" title="Sắp xếp theo số client">
+                                    CLIENTS <span id="sortIcon_concurrency" class="sort-arrow">↕</span>
+                                </th>
+                                <th class="sortable" onclick="sortHistory('totalReqs')" title="Sắp xếp theo tổng reqs">
+                                    TỔNG REQS <span id="sortIcon_totalReqs" class="sort-arrow">↕</span>
+                                </th>
+                                <th>THÀNH CÔNG</th>
+                                <th class="sortable" onclick="sortHistory('totalTimeSec')" title="Sắp xếp theo thời lượng kiểm thử">
+                                    THỜI LƯỢNG <span id="sortIcon_totalTimeSec" class="sort-arrow">↕</span>
+                                </th>
+                                <th class="sortable" onclick="sortHistory('rps')" title="Sắp xếp theo Throughput (RPS)">
+                                    THROUGHPUT (RPS) <span id="sortIcon_rps" class="sort-arrow">↕</span>
+                                </th>
+                                <th class="sortable" onclick="sortHistory('avgLatency')" title="Sắp xếp theo độ trễ trung bình">
+                                    ĐỘ TRỄ TB <span id="sortIcon_avgLatency" class="sort-arrow">↕</span>
+                                </th>
+                                <th class="sortable" onclick="sortHistory('p95')" title="Sắp xếp theo phân vị P95">
+                                    P95 LATENCY <span id="sortIcon_p95" class="sort-arrow">↕</span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="csvHistoryBody">
