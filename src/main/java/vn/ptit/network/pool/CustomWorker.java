@@ -2,7 +2,6 @@ package vn.ptit.network.pool;
 
 import lombok.Getter;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -14,12 +13,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class CustomWorker extends Thread {
 
-    private final BlockingQueue<Runnable> taskQueue;
+    private final CustomBlockingQueue<Runnable> taskQueue;
     private final AtomicBoolean running = new AtomicBoolean(true);
     @Getter
     private volatile boolean busy = false;
 
-    public CustomWorker(String name, BlockingQueue<Runnable> taskQueue) {
+    public CustomWorker(String name, CustomBlockingQueue<Runnable> taskQueue) {
         super(name);
         this.taskQueue = taskQueue;
     }

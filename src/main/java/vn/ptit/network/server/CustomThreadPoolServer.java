@@ -38,6 +38,21 @@ public class CustomThreadPoolServer extends BaseHttpServer {
     }
 
     @Override
+    public int getQueueSize() {
+        return customThreadPool != null ? customThreadPool.getQueueSize() : 0;
+    }
+
+    @Override
+    public int getActiveWorkers() {
+        return customThreadPool != null ? customThreadPool.getActiveCount() : 0;
+    }
+
+    @Override
+    public int getQueueCapacity() {
+        return config != null ? config.getQueueCapacity() : 1000;
+    }
+
+    @Override
     protected void dispatchClient(Socket socket) {
         try {
             customThreadPool.execute(() -> processConnection(socket));
@@ -59,7 +74,7 @@ public class CustomThreadPoolServer extends BaseHttpServer {
             customThreadPool.shutdownNow();
             Thread.currentThread().interrupt();
         }
-        System.out.println("[✓] Custom Thread Pool đã dừng hoàn tất.");
+        System.out.println("[OK] Custom Thread Pool đã dừng hoàn tất.");
     }
 
     private void sendServiceUnavailable(Socket socket) {

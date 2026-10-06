@@ -4,8 +4,6 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 
  * Mô hình kiến trúc:
  * - Áp dụng mẫu thiết kế Producer - Consumer:
- *   + Producer: Acceptor Thread nhận Socket và đẩy tác vụ vào Bounded Blocking Queue.
+ *   + Producer: Acceptor Thread nhận Socket và đẩy tác vụ vào Bounded CustomBlockingQueue.
  *   + Consumer: N Worker Threads liên tục tranh chấp an toàn để rút tác vụ từ Queue ra xử lý.
  * - Cơ chế tự bảo vệ: Giới hạn kích thước hàng đợi (Bounded Queue Capacity).
  *   Khi Queue đầy, kích hoạt RejectedExecutionException để bảo vệ hệ thống không bị tràn RAM.
@@ -27,7 +25,7 @@ public class CustomThreadPool {
     private final int poolSize;
     @Getter
     private final int queueCapacity;
-    private final BlockingQueue<Runnable> taskQueue;
+    private final CustomBlockingQueue<Runnable> taskQueue;
     private final List<CustomWorker> workers;
     private final AtomicBoolean isShutdown = new AtomicBoolean(false);
 
@@ -37,7 +35,7 @@ public class CustomThreadPool {
 
         this.poolSize = poolSize;
         this.queueCapacity = queueCapacity;
-        this.taskQueue = new ArrayBlockingQueue<>(queueCapacity);
+        this.taskQueue = new CustomBlockingQueue<>(queueCapacity);
         this.workers = new ArrayList<>(poolSize);
 
         // Khởi tạo trước N worker threads sống lâu (Pre-spawning Workers)
