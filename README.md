@@ -100,19 +100,20 @@ Multi-threading-Patterns/
 ### 1. Biên dịch dự án:
 Mở cửa sổ Command Prompt / PowerShell trong thư mục dự án và chạy:
 ```cmd
-build.bat
+.\build.bat
 ```
 *(Script sẽ tự động nhận diện JDK 21 tại `C:\Users\maiduc.vinh\.jdks\ms-21.0.10` và biên dịch toàn bộ mã nguồn).*
 
 ### 2. Khởi chạy máy chủ (Lựa chọn Mode):
-Chạy script `run_server.bat` kèm số thứ tự Mode muốn kiểm thử:
-```cmd
-run_server.bat 1      # Khởi động Mode 1: Iterative Single-Thread
-run_server.bat 2      # Khởi động Mode 2: Thread-per-Connection
-run_server.bat 3      # Khởi động Mode 3: Worker Thread Pool chuẩn
-run_server.bat 4      # Khởi động Mode 4: Java 21 Virtual Threads [Khuyên Dùng]
-run_server.bat 5      # Khởi động Mode 5: Custom Thread Pool tự lập trình
+Chạy script `run_server.bat` (hoặc `run_server.ps1` trên PowerShell) kèm số thứ tự Mode muốn kiểm thử:
+```powershell
+.\run_server.bat 1      # Khởi động Mode 1: Iterative Single-Thread (Baseline)
+.\run_server.bat 2      # Khởi động Mode 2: Thread-per-Connection (Naive)
+.\run_server.bat 3      # Khởi động Mode 3: Worker Thread Pool chuẩn (Queue 1000, 16 workers)
+.\run_server.bat 4      # Khởi động Mode 4: Java 21 Virtual Threads [Khuyên Dùng]
+.\run_server.bat 5      # Khởi động Mode 5: Custom Thread Pool tự lập trình từ đầu
 ```
+*(Nếu dùng PowerShell, bạn cũng có thể gõ trực tiếp: `.\run_server.ps1 4`)*
 
 ### 3. Mở Web Dashboard giám sát:
 Truy cập trình duyệt tại địa chỉ:
@@ -124,11 +125,13 @@ Truy cập trình duyệt tại địa chỉ:
 
 | Endpoint | Mục đích thực nghiệm | Mô tả hành vi kỹ thuật |
 | :--- | :--- | :--- |
-| `GET /dashboard` | Giám sát trực quan | Trả về Web Dashboard Dark-tech với 4 biểu đồ Canvas thời gian thực. |
-| `GET /api/metrics` | Dữ liệu thống kê JSON | Xuất toàn bộ số liệu: Total Requests, RPS, Latency (Avg, P95), Active Conns, CPU %, RAM MB, OS Threads. |
-| `GET /api/hello` | Đo Network I/O thuần túy | Phản hồi JSON ngay lập tức để đo trần thông lượng (Maximum Throughput). |
-| `GET /api/delay?ms=150` | Giả lập I/O-Bound | Gọi `Thread.sleep(ms)` mô phỏng truy vấn CSDL; phơi bày điểm nghẽn của Mode 1 và sức mạnh của Loom Mode 4. |
-| `GET /api/compute?n=32` | Giả lập CPU-Bound | Tính toán đệ quy Fibonacci thứ $n$; đo đạc chi phí chuyển ngữ cảnh (Context Switching) của CPU. |
+| `GET /dashboard` | Giám sát trực quan | Trả về Web Dashboard Dark-tech với 4 biểu đồ Canvas + Bảng Benchmark đối sánh thời gian thực. |
+| `GET /api/metrics` | Dữ liệu thống kê JSON | Xuất toàn bộ số liệu: Total Requests, RPS, Latency (Avg, P95), Active Conns, CPU %, RAM MB, OS Threads, Queue Size, Active Workers. |
+| `GET /api/benchmark` | Kết quả Benchmark JSON | Cung cấp ma trận đối sánh 4 mô hình luồng + toàn bộ lịch sử các lần đo đạc từ file CSV. |
+| `GET /benchmark/benchmark_results.csv` | Tải dữ liệu thực nghiệm | Cho phép tải trực tiếp file CSV chứa toàn bộ số liệu đo đạc thực tế. |
+| `GET /api/hello` | Đo Network I/O thuần túy | Phản hồi JSON ngay lập tức kèm định danh luồng (`thread`, `isVirtual`) để đo trần thông lượng. |
+| `GET /api/delay?ms=100` | Giả lập I/O-Bound | Gọi `Thread.sleep(ms)` mô phỏng truy vấn CSDL; phơi bày điểm nghẽn của Mode 1 và sức mạnh của Loom Mode 4. |
+| `GET /api/compute?n=30` | Giả lập CPU-Bound | Tính toán đệ quy Fibonacci thứ $n$; đo đạc chi phí chuyển ngữ cảnh (Context Switching) của CPU. |
 
 ---
 

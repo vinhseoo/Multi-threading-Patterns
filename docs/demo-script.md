@@ -1,116 +1,233 @@
-# ⏱️ KỊCH BẢN LIVE DEMO 5.5 PHÚT (TỪNG BƯỚC BẤM GIỜ)
+# ⏱️ KỊCH BẢN LIVE DEMO CHI TIẾT TỪNG BƯỚC (CHUẨN BẢO VỆ A+)
 ## ĐỀ TÀI T45: MULTI-THREADING PATTERNS IN NETWORK PROGRAMMING
 **Môn học:** Lập Trình Mạng (PTIT)  
 **Giảng viên chấm:** TS. Đặng Ngọc Hùng  
-**Mục tiêu:** Trình diễn trực quan, mượt mà, phơi bày rõ ràng bản chất kỹ thuật của 4 mô hình luồng, không để xảy ra thời gian chết (dead time).
+**Hình thức:** Sinh viên bảo vệ Solo (Một mình trình diễn Live Demo & Phản biện Q&A)  
+**Thời gian trình diễn:** 5 — 6 phút  
 
 ---
 
-## 🎯 BẢNG TỔNG QUAN TIẾN TRÌNH LIVE DEMO
-
-| Thời Gian | Phân Cảnh | Thao Tác Kỹ Thuật | Hiện Tượng Trực Quan Cần Chỉ Cho Thầy Xem |
-| :---: | :--- | :--- | :--- |
-| **00:00 – 01:00**<br>(1 phút) | **Khởi Động & Giới Thiệu Dashboard** | - Chạy `run_server.bat 4`<br>- Mở trình duyệt `http://localhost:8080/dashboard` | - Giao diện Dark-tech thời gian thực.<br>- 6 thẻ KPI & 4 biểu đồ Canvas cập nhật mỗi 500ms.<br>- Mức nền tài nguyên: 0 RPS, ~10 OS Threads, 4MB RAM. |
-| **01:00 – 02:15**<br>(1.25 phút) | **Đối Chứng: Single-Thread vs Đa Luồng** | - Chạy Mode 1 (`run_server.bat 1`) bắn tải.<br>- Chuyển sang Mode 2 (`run_server.bat 2`) bắn tải. | - Mode 1: 30 requests delay 100ms mất **3.0 giây** tuần tự.<br>- Mode 2: 30 requests delay 100ms xong ngay trong **110ms**.<br>- Thầy thấy ngay giá trị sống còn của đa luồng. |
-| **02:15 – 03:45**<br>(1.5 phút) | **Thử Thách Tải Cao: C1000 Stress & Worker Pool** | - Bắn 1,000 requests vào Mode 2.<br>- Chuyển sang Mode 3 (`run_server.bat 3`) bắn 1,000 reqs. | - Mode 2: OS Threads vọt lên hàng nghìn, CPU nhảy vì Context Switch.<br>- Mode 3: Luồng bị khóa cứng ở 16 luồng, task xếp hàng trong Queue và tiêu thụ êm ái. |
-| **03:45 – 05:00**<br>(1.25 phút) | **Đỉnh Cao: Java 21 Project Loom Virtual Threads** | - Bật Mode 4 (`run_server.bat 4`).<br>- Chạy `run_benchmark.bat` bắn 2,500 kết nối đồng thời. | - 2,500 kết nối xử lý trong chớp mắt.<br>- Đồ thị **Active Connections vọt lên cao nhưng OS Threads vẫn phẳng lì ở mức 15 luồng**!<br>- Thấy rõ chữ ký `"isVirtual": true`. |
-| **05:00 – 05:30**<br>(0.5 phút) | **Kết Luận Live Demo** | - Mở file CSV `benchmark_results.csv`.<br>- Tóm tắt kết quả. | - Bảng số liệu khoa học chứng minh thông lượng tăng gấp nhiều lần.<br>- Chuyển lời mời thầy đặt câu hỏi phản biện Q&A. |
+> [!IMPORTANT]
+> **MỤC TIÊU CỐT LÕI CỦA BUỔI LIVE DEMO:**  
+> Không chỉ chạy code cho vui, mà phải **chỉ rõ được sự biến thiên của các chỉ số hệ điều hành (OS Native Threads, Context Switching, TCP Backlog, Bounded Queue, và Virtual Threads M:N Mapping)** ngay trên màn hình Web Dashboard thời gian thực trước mắt thầy Đặng Ngọc Hùng!
 
 ---
 
-## 🎬 KỊCH BẢN CHI TIẾT TỪNG PHÚT (KÈM LỜI THOẠI MẪU)
+## 🖥️ CHUẨN BỊ MÔI TRƯỜNG TRƯỚC KHI BẮT ĐẦU (00:00)
 
-### 📍 PHÂN CẢNH 1: KHỞI ĐỘNG MÁY CHỦ & GIỚI THIỆU WEB DASHBOARD (00:00 – 01:00)
-
-* **Thao tác:**
-  1. Mở cửa sổ Terminal/Command Prompt trong thư mục dự án.
-  2. Gõ lệnh khởi động máy chủ:
-     ```cmd
-     run_server.bat 4
-     ```
-  3. Mở trình duyệt Chrome/Edge truy cập địa chỉ:
-     `http://localhost:8080/dashboard`
-* **Lời thoại trình bày:**
-  > *"Kính thưa thầy, để trực quan hóa toàn bộ hành vi đa luồng ở mức hệ điều hành, em đã tự tay xây dựng một Web Dashboard thời gian thực cập nhật chu kỳ 500ms bằng 100% Native Canvas không dùng bất kỳ thư viện bên ngoài nào.*  
-  > *Như thầy có thể quan sát trên màn hình:*  
-  > *- Phía trên là Badge trạng thái hiển thị máy chủ đang chạy ở **Mode 4: Java 21 Virtual Threads**.*  
-  > *- 6 thẻ KPI phía trên phản ánh thông lượng RPS, số lượng kết nối đang mở, độ trễ phản hồi, và đặc biệt là chỉ số **OS Native Threads** lấy trực tiếp từ JMX.*  
-  > *- Phía dưới là 4 biểu đồ thời gian thực và trung tâm điều khiển Live Demo."*
+1. **Mở 2 cửa sổ Terminal (PowerShell hoặc CMD) tại thư mục dự án:**
+   - **Terminal 1 (Server Console):** Dùng để bật/tắt các Mode máy chủ (`.\run_server.bat <mode>` hoặc `.\run_server.ps1 <mode>`).
+   - **Terminal 2 (Benchmark Runner - Tùy chọn):** Dùng khi muốn bắn tải cực lớn bằng công cụ dòng lệnh (`benchmark\run_benchmark.bat`).
+2. **Mở trình duyệt (Chrome/Edge):**
+   - Truy cập sẵn đường dẫn: `http://localhost:8080/dashboard`
+   - Nhấn `F11` (Full screen) để giao diện hiển thị trọn vẹn, chuyên nghiệp nhất.
 
 ---
 
-### 📍 PHÂN CẢNH 2: ĐỐI CHỨNG SINGLE-THREAD (MODE 1) VS MULTI-THREAD (MODE 2) (01:00 – 02:15)
+## 🎯 BẢNG TRA CỨU NHANH HIỆN TƯỢNG TRỰC QUAN TRÊN DASHBOARD THEO TỪNG MODE
 
-* **Thao tác:**
-  1. Nhấn `Ctrl + C` tắt server hiện tại, khởi động **Mode 1: Iterative Server**:
-     ```cmd
-     run_server.bat 1
-     ```
-  2. Refresh lại Dashboard.
-  3. Tại mục **🎮 DEMO CONTROL CENTER**, click nút:
-     `⚡ Burst 30 Reqs (Delay 100ms)`
-  4. Quan sát Terminal Log và đồ thị.
-* **Lời thoại trình bày:**
-  > *"Đầu tiên, em khởi động **Mode 1 - Single-Threaded Iterative Server**. Em sẽ bắn 30 requests vào endpoint `/api/delay?ms=100` mô phỏng truy vấn cơ sở dữ liệu.*  
-  > *Thầy có thể thấy trên màn hình: Vì chỉ có 1 luồng duy nhất xử lý tuần tự, tổng thời gian hoàn tất mất đúng **3,000ms (tức 3 giây)**! Trong lúc luồng bận xử lý request số 1, thì 29 request còn lại bị giam lỏng hoàn toàn trong hàng đợi TCP Backlog của Hệ điều hành.*  
-  > *Bây giờ, em chuyển sang **Mode 2 - Thread-per-Connection**:*  
-  > *(Khởi động `run_server.bat 2` và click lại nút Burst 30 Reqs)*  
-  > *Ngay lập tức, 30 requests hoàn tất trong chỉ **110ms**! Đồ thị Active Connections và OS Threads nhảy đồng thời 30 luồng. Đây là minh chứng rõ nhất vì sao lập trình mạng bắt buộc phải ứng dụng đa luồng."*
+| Chế Độ (Mode) | Lệnh Khởi Động | Huy Hiệu Header (Badge) | Nút Thử Nghiệm Bấm | Biến Thiên KPI Trên Dashboard | Hiện Tượng Biểu Đồ Số 3 (Key Chart) | Log Console Phía Dưới |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Mode 1**<br>Iterative Single-Thread | `.\run_server.bat 1` | `Mode 1: Iterative...`<br>*(Xám: Đơn luồng tuần tự)* | `⚡ Burst 30 Reqs (Delay 100ms)` | - **RPS:** ~9.8 RPS (Cực thấp)<br>- **Latency:** ~2,500ms - 3,000ms<br>- **OS Threads:** Giữ nguyên 7-10 luồng | **CẢ 2 ĐƯỜNG ĐỀU PHẲNG LÌ:**<br>- **Đường Xanh (Conns):** Giữ nguyên ở mức **1** (chỉ accept 1 kết nối tại 1 thời điểm).<br>- **Đường Đỏ (Threads):** Giữ nguyên **7-10 luồng**. | In ra lần lượt từng dòng rất chậm:<br>`[✓] HTTP 200 trong ...ms [Thread: main]` |
+| **Mode 2**<br>Thread-per-Conn | `.\run_server.bat 2` | `Mode 2: Thread-per-Conn...`<br>*(Đỏ: 1 Thread Per Socket)* | `⚡ Burst 30 Reqs (Delay 100ms)`<br>Hoặc `🚀 Spike 100 Reqs` | - **RPS:** Vọt lên 250 - 280 RPS<br>- **Latency:** Xong ngay trong **110ms - 130ms**!<br>- **OS Threads:** **Tăng vọt thêm 30 - 100 luồng!** | **Đường Xanh (Conns) và Đường Đỏ (Threads) DÍNH CHẶT VÀO NHAU cùng nhảy vọt lên đỉnh!** | Bắn ra đồng loạt 30 dòng cùng lúc:<br>`[✓] HTTP 200 trong 115ms [Thread: ThreadPerConn-1]`<br>`[Thread: ThreadPerConn-2]...` |
+| **Mode 3**<br>Worker Thread Pool | `.\run_server.bat 3` | `Mode 3: Worker Thread Pool...`<br>*(Vàng: Queue: 0/1000 \| Workers: 16/16)* | Click nút cam:<br>**`🔥 Benchmark 500 Clients`**<br>*(Hoặc Terminal: run_benchmark.bat)* | - **RPS:** Ổn định ~150 RPS<br>- **Latency:** ~210ms (16 worker chia 2 đợt)<br>- **OS Threads:** **BỊ KHÓA CỨNG Ở 16 LUỒNG!** | **Đường Xanh (Conns)** vọt lên 500,<br>nhưng **Đường Đỏ (Threads)** bị **chặn trần tuyệt đối ở mức 16 luồng**! | Các worker luân phiên tiêu thụ task:<br>`[Thread: WorkerPool-1]`<br>`[Thread: WorkerPool-2]...` |
+| **Mode 4**<br>Java 21 Virtual Threads | `.\run_server.bat 4` | `Mode 4: Java 21 Virtual Threads...`<br>*(Xanh ngọc: OS Carrier Threads: 16)* | `🚀 Spike 100 Reqs`<br>Hoặc Benchmark 1,000 clients | - **RPS:** **Vọt lên 1,100+ RPS**<br>- **Latency:** Siêu tốc **70ms - 90ms**<br>- **OS Threads:** **HOÀN TOÀN PHẲNG LÌ Ở 15-16 LUỒNG!** | **Đường Xanh (Conns) vọt lên đỉnh chót vót (1,000 conns)**,<br>trong khi **Đường Đỏ (OS Threads) NẰM NGANG PHẲNG LÌ** dưới đáy! | In ra hàng loạt luồng ảo siêu nhẹ:<br>`[✓] HTTP 200 trong 72ms [Thread: VirtualThread-1] [Loom Virtual]` |
 
 ---
 
-### 📍 PHÂN CẢNH 3: THỬ THÁCH GIỚI HẠN TẢI CAO (C1000) & WORKER THREAD POOL (02:15 – 03:45)
+## 🎬 KỊCH BẢN CHI TIẾT TỪNG PHÂN CẢNH (CÓ LỜI THOẠI MẪU)
 
-* **Thao tác:**
-  1. Khi server đang chạy ở Mode 2, click nút:
-     `🚀 Spike 100 Reqs Đồng Thời!` hoặc chạy terminal benchmark:
-     ```cmd
-     benchmark\run_benchmark.bat -c 500 -n 1000 --url http://localhost:8080/api/delay?ms=100
-     ```
-  2. Chỉ cho thầy thấy: Số lượng **OS Native Threads** trên Dashboard tăng vọt lên hàng trăm luồng, RAM Heap tăng nhanh, CPU bắt đầu giật lag vì Context Switching.
-  3. Dừng Mode 2, chuyển sang **Mode 3: Worker Thread Pool**:
-     ```cmd
-     run_server.bat 3
-     ```
-  4. Bắn lại đúng gói tải 500 clients, 1,000 requests đó.
-* **Lời thoại trình bày:**
-  > *"Tuy Mode 2 giải quyết được bài toán tuần tự, nhưng khi số lượng kết nối tăng vọt lên hàng trăm hay hàng nghìn, mỗi luồng OS ngốn 1MB Stack Memory, làm nảy sinh chi phí chuyển ngữ cảnh (Context Switching) đắt đỏ khiến CPU kiệt quệ.*  
-  > *Để khắc phục, các hệ thống doanh nghiệp sử dụng **Mode 3 - Worker Thread Pool với Hàng đợi Bounded Queue** mà em đã lập trình ở đây.*  
-  > *Như thầy thấy trên biểu đồ số 3:*  
-  > *- Dù có 500 kết nối gửi đến, số lượng **OS Platform Threads được khống chế nghiêm ngặt ở mức 16 luồng cố định** (Core Pool Size).*  
-  > *- Các task tự động xếp hàng ngăn nắp trong Queue và được 16 worker tiêu thụ tuần tự.*  
-  > *- RAM phẳng lì, CPU không hề bị nghẽn Context Switch. Nếu hàng đợi bị quá tải 1,000 tasks, server kích hoạt Rejection Policy trả về ngay HTTP 503 Service Unavailable để tự bảo vệ, không bao giờ bị crash tiến trình."*
+---
+
+### 📍 PHÂN CẢNH 1: KHỞI ĐỘNG HỆ THỐNG & GIỚI THIỆU TỔNG QUAN DASHBOARD (00:00 – 01:00)
+
+#### 1. Thao tác kỹ thuật:
+- Tại Terminal 1, khởi động máy chủ ở **Mode 4** (Chế độ hiện đại nhất):
+  ```powershell
+  .\run_server.bat 4
+  ```
+  *(Hoặc nếu chạy PowerShell: `.\run_server.ps1 4`)*
+- Mở trình duyệt tại `http://localhost:8080/dashboard`.
+
+#### 2. Chỉ tay vào màn hình Dashboard và giải thích:
+- **Thanh Header trên cùng:**
+  - **Badge Chế độ:** Đang hiển thị `Mode 4: Java 21 Virtual Threads (Project Loom)` với chấm tròn xanh đang nhấp nháy (Live Polling mỗi 500ms).
+  - **Badge Luồng nền:** Hiển thị `OS Carrier Threads: 16 (M:N Mapping)`.
+- **6 Thẻ KPI Thời Gian Thực:**
+  - `THROUGHPUT (RPS)`: Đo thông lượng tức thời bằng cửa sổ trượt Lock-free (LongAdder).
+  - `TOTAL REQUESTS`: Tổng số request đã nhận và phân loại Thành công / Thất bại.
+  - `RESPONSE LATENCY`: Độ trễ trung bình, Min và phân vị **P95 Latency**.
+  - `ACTIVE CONNECTIONS`: Số socket kết nối mạng đang mở đồng thời.
+  - `OS NATIVE THREADS`: **Số luồng vật lý cấp hệ điều hành** lấy trực tiếp từ JMX `ThreadMXBean`.
+  - `JVM HEAP & CPU`: Đo tiêu hao % CPU và RAM Heap của tiến trình máy chủ.
+- **4 Biểu Đồ Canvas Native 60fps:**
+  - Biểu đồ 1 (Xanh lơ Cyan): Throughput RPS theo thời gian.
+  - Biểu đồ 2 (Tím Violet): Biến thiên độ trễ mạng (Latency ms).
+  - **Biểu đồ 3 (Trọng tâm đề tài):** Đối đầu trực diện giữa **Active Connections (Xanh lá)** và **OS Native Threads (Đỏ hồng)**.
+  - Biểu đồ 4 (Xanh dương / Vàng): Mức độ ngốn CPU và RAM.
+
+#### 3. Lời thoại trình bày:
+> *"Kính thưa thầy Đặng Ngọc Hùng, để phơi bày trực quan và đo lường chính xác hành vi của các mô hình đa luồng ở mức hệ điều hành, em đã tự tay xây dựng toàn bộ Web Dashboard thời gian thực cập nhật chu kỳ 500ms bằng 100% Native Canvas không dùng bất kỳ thư viện bên ngoài nào.*  
+> *Mục tiêu xuyên suốt của buổi demo hôm nay là chứng minh sự chuyển dịch kiến trúc: Từ mô hình Đơn luồng tuần tự bế tắc, qua Đa luồng truyền thống gây cạn kiệt tài nguyên OS Thread, chuẩn hóa bằng Thread Pool doanh nghiệp, và đạt đỉnh cao hiệu năng với Java 21 Virtual Threads."*
+
+---
+
+### 📍 PHÂN CẢNH 2: ĐỐI CHỨNG SINGLE-THREAD (MODE 1) VS THREAD-PER-CONNECTION (MODE 2) (01:00 – 02:15)
+
+#### 1. Bước A: Chạy Mode 1 (Single-Threaded Iterative Server)
+- **Thao tác:**
+  - Tại Terminal 1, bấm `Ctrl + C` để dừng server, gõ:
+    ```powershell
+    .\run_server.bat 1
+    ```
+  - Chuyển sang trình duyệt (Dashboard tự động nhận diện `Mode 1: Iterative Single-Threaded Server`).
+  - Tại mục **🎮 DEMO CONTROL CENTER**, click nút:
+    `⚡ Burst 30 Reqs (Delay 100ms)`
+- **Hiện tượng trên màn hình cần chỉ cho thầy xem:**
+  1. **Log Console:** Các dòng log nhảy rất chậm chạp, lần lượt từng request một, mỗi dòng cách nhau đúng 100ms:
+     `[✓] HTTP 200 trong 105ms [Thread: main]`  
+     `[✓] HTTP 200 trong 210ms [Thread: main]`...
+     Đặc biệt, tên luồng luôn cố định là `[Thread: main]`.
+  2. **Thẻ KPI Response Latency:** Trung bình độ trễ vọt lên **2,500ms - 3,000ms**, P95 chạm đỉnh **3,000ms**!
+  3. **Biểu đồ số 3 (Khoảnh khắc cốt lõi giải thích bản chất nghẽn mạng):**
+     - **Cả 2 đường đều phẳng lì đứng yên:** Đường xanh lá (Active Connections) luôn giữ ở mức **1**, đường đỏ (OS Threads) giữ nguyên ở mức **7** luồng.
+     - **Giải thích tầng sâu kiến trúc mạng:** Tại sao bắn 30 requests mà Active Connections không nhảy lên 30?
+       + Vì máy chủ chỉ có **DUY NHẤT 1 luồng `main`**, nó vừa làm nhiệm vụ `accept()` vừa trực tiếp xử lý `processConnection()`.
+       + Khi nhận Request số 1, luồng `main` bị **block cứng 100ms** để xử lý. Trong suốt 100ms đó, luồng `main` **chưa hề quay lại vòng lặp để gọi `accept()` cho 29 request còn lại**!
+       + 29 request còn lại hoàn toàn bị **giam lỏng trong hàng đợi TCP Backlog của Kernel Hệ điều hành** (chưa hề được đưa lên tầng Application của Java).
+       + Xử lý xong Request 1 -> đóng socket -> mới `accept()` tiếp Request 2. Do đó ở tầng ứng dụng, tại mọi thời điểm **Active Connections chỉ có tối đa 1 kết nối duy nhất**!
+  4. **Đối chiếu với Mode 2 tiếp theo:** Khi chuyển sang Mode 2 (Thread-per-Conn), luồng Acceptor chỉ làm `accept()` rồi ủy thác ngay cho luồng mới, nên cả 30 socket mới được accept đồng thời và kéo cả 2 đường cùng nhảy vọt lên 30!
+
+#### 2. Bước B: Chuyển sang Mode 2 (Thread-per-Connection)
+- **Thao tác:**
+  - Tại Terminal 1, bấm `Ctrl + C`, gõ:
+    ```powershell
+    .\run_server.bat 2
+    ```
+  - Trên Dashboard, Header đổi sang viền đỏ: `Mode 2: Thread-per-Connection Server`.
+  - Click lại nút:
+    `⚡ Burst 30 Reqs (Delay 100ms)`
+- **Hiện tượng bùng nổ trên màn hình:**
+  1. **Log Console:** Ngay lập tức, **toàn bộ 30 requests hoàn tất đồng loạt trong chỉ 115ms**!
+     Dòng thông báo: `[🔥 HOÀN TẤT TẢI] 30 reqs trong 118ms (Thành công: 30, Lỗi: 0)`.
+     Tên luồng được phân nhánh độc lập: `[Thread: ThreadPerConn-1]`, `[Thread: ThreadPerConn-2]`...
+  2. **Thẻ KPI OS Native Threads:** Con số lập tức nhảy tăng thêm **30 luồng**!
+  3. **Biểu đồ số 3 (Khoảnh khắc ấn tượng):** Đường màu xanh lá (Connections) và đường màu đỏ (OS Threads) **nhảy vọt song song cùng nhau lên đỉnh 30 luồng**!
+
+#### 3. Lời thoại trình bày:
+> *"Thưa thầy, đây là minh chứng rõ ràng nhất cho giá trị sống còn của lập trình mạng đa luồng: Cùng một khối lượng 30 requests mô phỏng I/O 100ms, Mode 1 mất tới 3.0 giây tuần tự, trong khi Mode 2 hoàn tất chỉ trong 115 mili-giây — nhanh hơn gấp gần 30 lần!*  
+> *Tuy nhiên, như thầy thấy ở Biểu đồ số 3: Cứ mỗi kết nối vào, Hệ điều hành lại phải đẻ ra một luồng native mới (`new Thread()`). Điều này dẫn tới điểm nghẽn nghiêm trọng khi tải tăng cao."*
+
+---
+
+### 📍 PHÂN CẢNH 3: THỬ THÁCH GIỚI HẠN TẢI CAO (C1000 STRESS) & WORKER THREAD POOL (02:15 – 03:45)
+
+#### 1. Bước A: Phơi bày tử huyệt của Mode 2 dưới tải lớn
+- **Thao tác:**
+  - Khi server đang chạy ở Mode 2, click nút:
+    `🚀 Spike 100 Reqs Đồng Thời!`
+    *(Hoặc tại Terminal 2 chạy: `cmd.exe /c "benchmark\run_benchmark.bat -c 500 -n 1000 --url http://localhost:8080/api/delay?ms=100"`)*
+- **Hiện tượng trên màn hình:**
+  1. Thẻ **OS Native Threads** tăng vọt lên hàng trăm luồng!
+  2. Biểu đồ số 4: CPU bắt đầu nhảy mạnh do **Context Switching Overhead** (Hệ điều hành liên tục tráo đổi thanh ghi và xóa sạch L1/L2 Cache của CPU).
+  3. Bộ nhớ RAM tăng vọt vì mỗi OS Thread trong JVM ngốn mặc định 1MB Stack Memory (`-Xss1m`).
+
+#### 2. Bước B: Kích hoạt Mode 3 (Worker Thread Pool chuẩn doanh nghiệp)
+- **Thao tác:**
+  - Tại Terminal 1, bấm `Ctrl + C`, khởi động Mode 3:
+    ```powershell
+    .\run_server.bat 3
+    ```
+  - Quan sát Header Dashboard: Hiển thị ngay badge màu vàng:  
+    `📦 Queue: 0/1000 | Workers: 16/16`.
+  - Tại mục **🎮 DEMO CONTROL CENTER**, click trực tiếp nút cam:  
+    👉 **`🔥 Benchmark 500 Clients (1,000 Reqs)`**  
+    *(Máy chủ sẽ tự động gọi ngầm `JavaLoadTester` phát động 500 luồng TCP đồng thời bắn vào máy chủ mà bạn không cần mở terminal gõ tay!)*
+- **Hiện tượng kiểm soát tài nguyên tuyệt đối cần chỉ cho thầy xem:**
+  1. **Thẻ KPI OS Native Threads:** Con số **bị khóa cứng ở mức 16 luồng cố định** (cộng vài luồng nền JVM là ~26 luồng), tuyệt đối không bao giờ vượt quá!
+  2. **Huy hiệu Queue trên Header:** Nhảy số phản ánh tác vụ xếp hàng trong Bounded ArrayBlockingQueue và được 16 Worker Threads tiêu thụ nhịp nhàng.
+  3. **Biểu đồ số 3:** Đường xanh lá (Connections) vọt lên 100-500, nhưng **đường đỏ OS Threads nằm ngang chặn trần ở mức 16 luồng**!
+  4. **Log Console:** Tên luồng quay vòng có kiểm soát: `[Thread: WorkerPool-1]`, `[Thread: WorkerPool-2]`... `[Thread: WorkerPool-16]`.
+
+#### 3. Lời thoại trình bày:
+> *"Thưa thầy, để khắc phục triệt để nguy cơ sập bộ nhớ và nghẽn CPU của Mode 2, ở **Mode 3 - Worker Thread Pool**, em đã áp dụng mẫu thiết kế Producer-Consumer chuẩn doanh nghiệp:*  
+> *- Acceptor thread nhận socket và đẩy vào Bounded Blocking Queue sức chứa 1,000 tasks.*  
+> *- 16 Worker Threads được tạo sẵn (Pre-spawned) liên tục rút task ra xử lý.*  
+> *Như thầy thấy trên Biểu đồ số 3: Dù tải tăng đột biến, số lượng OS Platform Threads vẫn được khống chế nghiêm ngặt ở 16 luồng, CPU không bị lãng phí Context Switch. Nếu hàng đợi vượt quá 1,000 tasks, máy chủ kích hoạt Rejection Policy trả về ngay HTTP 503 Service Unavailable để tự bảo vệ, không bao giờ bị Crash tiến trình."*
 
 ---
 
 ### 📍 PHÂN CẢNH 4: ĐỈNH CAO JAVA 21 PROJECT LOOM VIRTUAL THREADS (03:45 – 05:00)
 
-* **Thao tác:**
-  1. Tắt Mode 3, khởi động **Mode 4: Java 21 Virtual Threads**:
-     ```cmd
-     run_server.bat 4
-     ```
-  2. Mở một cửa sổ dòng lệnh thứ 2, chạy kịch bản thử thách cực đại:
-     ```cmd
-     benchmark\run_benchmark.bat -c 1000 -n 3000 --url http://localhost:8080/api/delay?ms=50
-     ```
-  3. Chỉ tay lên Dashboard vào **Biểu đồ số 3 (Active Connections vs OS Native Threads)**.
-* **Lời thoại trình bày (Điểm chốt hạ ấn tượng nhất):**
-  > *"Và thưa thầy, đây là điểm đột phá lớn nhất của đề tài: **Mode 4 - Java 21 Virtual Threads (Project Loom)**.*  
-  > *Em vừa phát sinh đồng thời **1,000 kết nối đồng thời** bắn 3,000 requests.*  
-  > *Xin thầy hãy quan sát kỹ **Biểu đồ số 3**:*  
-  > *- Đường màu xanh lá (Active Connections) vọt lên đỉnh 1,000 kết nối.*  
-  > *- Nhưng đường màu đỏ (**OS Native Threads**) hoàn toàn nằm phẳng lì ở mức **chỉ 15–16 luồng**!*  
-  > *- Nguyên lý: Khi một Virtual Thread bị block ở thao tác mạng hoặc delay, JVM tự động unmount nó khỏi Carrier Thread của OS và đưa luồng khác vào chạy. Khi có dữ liệu, nó mount trở lại.*  
-  > *Kết quả đo đạc: Thông lượng đạt hơn **1,000 Requests/giây (RPS)**, độ trễ P95 chỉ vài chục mili-giây, và RAM chỉ tiêu tốn vỏn vẹn vài chục MB! Hệ thống chạy êm ái, đạt chuẩn bài toán C10K hiện đại."*
+#### 1. Thao tác kỹ thuật:
+- Tại Terminal 1, chuyển sang **Mode 4**:
+  ```powershell
+  .\run_server.bat 4
+  ```
+- Tại Terminal 2, chạy kịch bản thử thách cực đại (1,000 clients đồng thời, 3,000 requests):
+  ```powershell
+  cmd.exe /c "benchmark\run_benchmark.bat -c 1000 -n 3000 --url http://localhost:8080/api/delay?ms=100"
+  ```
+- Quay sang màn hình Dashboard quan sát trực tiếp.
+
+#### 2. Hiện tượng ĐỘT PHÁ trên màn hình (Điểm chốt hạ lấy trọn điểm A+):
+1. **Biểu đồ số 3 (Khoảnh khắc đắt giá nhất của buổi bảo vệ):**
+   - Đường màu xanh lá (**Active Connections**) vọt lên đỉnh cao chót vót: **1,000 kết nối đồng thời**!
+   - Nhưng đường màu đỏ (**OS Native Threads**) **hoàn toàn nằm ngang phẳng lì ở mức chỉ 15–16 luồng Carrier Threads**!
+2. **Thẻ KPI Thông Lượng (Throughput RPS):**
+   - Vọt lên con số ấn tượng: **1,100+ Requests/giây**!
+3. **Thẻ KPI Response Latency:**
+   - Dù có 1,000 client cùng bắn tải, độ trễ P95 chỉ ở mức **90ms - 95ms**!
+4. **Log Console:**
+   - Từng dòng log in ra kèm chữ ký xác thực:  
+     `[✓] HTTP 200 trong 72ms [Thread: VirtualThread-142] [Loom Virtual]`.
+5. **Tiêu hao phần cứng (KPI Card 6):**
+   - RAM Heap chỉ tiêu tốn vỏn vẹn **~70MB**, không hề bị quá tải.
+
+#### 3. Lời thoại trình bày:
+> *"Và thưa thầy, đây chính là điểm đột phá công nghệ cao nhất của đề tài em: **Mode 4 — Java 21 Virtual Threads (Project Loom)**.*  
+> *Em vừa phát sinh **1,000 kết nối đồng thời** bắn 3,000 requests vào máy chủ.*  
+> *Xin thầy hãy quan sát kỹ **Biểu đồ số 3** trên màn hình:*  
+> *- Đường màu xanh lá (Active Connections) vọt lên đỉnh 1,000 kết nối.*  
+> *- Nhưng đường màu đỏ (**OS Platform Threads**) hoàn toàn nằm phẳng lì ở mức **chỉ 15–16 luồng**!*  
+> *- **Bản chất kỹ thuật:** Virtual Thread là luồng ảo chạy trong User-space do JVM quản lý với mô hình ánh xạ M:N. Khi một luồng ảo bị block ở thao tác mạng hoặc I/O delay, JVM tự động unmount nó khỏi Carrier Thread và gán luồng ảo khác vào chạy tiếp. Khi có dữ liệu, nó mount trở lại.*  
+> *Nhờ đó, ta đạt được thông lượng kỷ lục hơn 1,100 RPS với chi phí bộ nhớ chỉ vài KB mỗi luồng, lập trình blocking tuần tự dễ hiểu nhưng hiệu năng tương đương non-blocking phức tạp!"*
 
 ---
 
-### 📍 PHÂN CẢNH 5: TỔNG KẾT LIVE DEMO & MỜI PHẢN BIỆN (05:00 – 05:30)
+### 📍 PHÂN CẢNH 5: BẢNG ĐỐI SÁNH BENCHMARK TRỰC TIẾP TRÊN DASHBOARD & KẾT LUẬN (05:00 – 05:30)
 
-* **Thao tác:**
-  1. Mở file [benchmark/benchmark_results.csv](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/benchmark/benchmark_results.csv) trên màn hình.
-  2. Chỉ vào các cột so sánh Throughput RPS và Latency giữa 4 Mode.
-* **Lời thoại trình bày:**
-  > *"Toàn bộ kết quả thực nghiệm của các Mode đều đã được công cụ `JavaLoadTester` tự động lưu lại vào file CSV với đầy đủ dấu ấn thời gian và phân vị độ trễ.*  
-  > *Phần trình diễn Live Demo của em đến đây là kết thúc. Em xin kính mời thầy Đặng Ngọc Hùng đặt câu hỏi phản biện ạ!"*
+#### 1. Thao tác kỹ thuật:
+- Cuộn chuột xuống ngay bên dưới 4 biểu đồ Canvas tới mục:  
+  **📊 BẢNG ĐỐI SÁNH HIỆU NĂNG THỰC NGHIỆM (4 MÔ HÌNH LUỒNG)**.
+- Nhấp nút **`🔄 Làm Mới Dữ Liệu`** (Dashboard tự động gọi `/api/benchmark` và hiển thị kết quả).
+
+#### 2. Chỉ vào các phần tử trực quan trên màn hình Benchmark:
+1. **Bảng Ma Trận Đối Sánh Tổng Hợp (Benchmark Matrix Table):**
+   - Chỉ vào hàng **Mode 1 (Iterative)**: RPS 9.8, P95 3,050ms -> Điểm nghẽn tuần tự ở TCP Backlog.
+   - Chỉ vào hàng **Mode 2 (Thread-per-Connection)**: RPS 285.4, OS Threads 500+ luồng, RAM 550MB -> Điểm nghẽn Context Switching và nguy cơ OOM Crash.
+   - Chỉ vào hàng **Mode 3 (Worker Thread Pool)**: RPS 152.0, OS Threads 16 luồng cố định, RAM 65MB -> An toàn, ổn định với Bounded Queue.
+   - Chỉ vào hàng **Mode 4 (Virtual Threads Loom)**: RPS 1,145.2, P95 95ms, OS Threads 15-16 luồng phẳng -> Đỉnh cao thông lượng.
+   - Chỉ vào hàng **Mode 5 (Custom Thread Pool)**: Mô hình tự viết BlockingQueue và Worker từ đầu để chứng minh hiểu sâu internals.
+2. **Hai Thanh Đồ Thị Đối Sánh Cột (Visual Bars):**
+   - Thanh màu xanh ngọc (Mode 4) chiếm ưu thế áp đảo về Throughput (1,145 RPS).
+   - Thanh độ trễ P95 của Mode 4 ngắn nhất (chỉ 95ms so với 3,050ms của Mode 1).
+3. **Bảng Lịch Sử Các Lần Test (Trích xuất từ `benchmark_results.csv`):**
+   - Chỉ cho thầy thấy từng lần đo đạc thực tế có dấu ấn thời gian (Timestamp), số Client, số Request thành công 100%, và phân vị độ trễ P50/P95.
+   - Nút **`📥 Tải File CSV`** cho phép tải file dữ liệu thô về máy bất cứ lúc nào.
+
+#### 3. Lời thoại kết luận và chuyển sang phần Q&A:
+> *"Thưa thầy, toàn bộ các số liệu đo đạc khoa học từ công cụ `JavaLoadTester` đều đã được hiển thị trực quan trên Bảng đối sánh Benchmark của Dashboard và tự động đồng bộ vào file CSV.*  
+> *Đề tài đã hoàn thành xuất sắc mục tiêu: Đối chứng toàn diện 4 mô hình luồng kinh điển và ứng dụng thành công Java 21 Project Loom để giải bài toán nghẽn mạng High-Concurrency.*  
+> *Phần trình diễn Live Demo của em đến đây là kết thúc. Em xin kính mời thầy Đặng Ngọc Hùng đặt câu hỏi phản biện ạ!"*
+
+---
+
+## 💡 GỢI Ý MẸO PHẢN XẠ NHANH KHI GẶP TÌNH HUỐNG TRÊN LỚP
+
+- **Nếu thầy bảo: "Em đổi cổng server sang 9090 xem sao?":**  
+  Chạy ngay: `.\run_server.bat 4 9090` (máy chủ đã hỗ trợ tham số port thứ 2).
+- **Nếu thầy bảo: "Em thử chứng minh cơ chế từ chối tải 503 của Thread Pool xem?":**  
+  Bật Mode 3, dùng terminal bắn tải vượt quá 1,000 tasks trong queue, server sẽ lập tức trả về mã HTTP 503 kèm header `Retry-After: 2` hiển thị trên màn hình.
+- **Nếu thầy bảo: "Em có tự viết Thread Pool không hay chỉ dùng thư viện có sẵn?":**  
+  Bật ngay **Mode 5** (`.\run_server.bat 5`) và mở file [CustomThreadPool.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomThreadPool.java) và [CustomWorker.java](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/src/main/java/vn/ptit/network/pool/CustomWorker.java) giải thích cơ chế synchronized, wait/notify và volatile. Thầy sẽ chấm điểm A+ ngay lập tức!
