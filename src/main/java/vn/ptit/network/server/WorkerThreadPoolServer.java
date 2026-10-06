@@ -72,6 +72,21 @@ public class WorkerThreadPoolServer extends BaseHttpServer {
     }
 
     @Override
+    public int getQueueSize() {
+        return threadPool != null ? threadPool.getQueue().size() : 0;
+    }
+
+    @Override
+    public int getActiveWorkers() {
+        return threadPool != null ? threadPool.getActiveCount() : 0;
+    }
+
+    @Override
+    public int getQueueCapacity() {
+        return config != null ? config.getQueueCapacity() : 1000;
+    }
+
+    @Override
     protected void dispatchClient(Socket socket) {
         try {
             threadPool.execute(new SocketHandlerRunnable(socket));
@@ -93,7 +108,7 @@ public class WorkerThreadPoolServer extends BaseHttpServer {
             threadPool.shutdownNow();
             Thread.currentThread().interrupt();
         }
-        System.out.println("[✓] Worker Thread Pool đã dừng hoàn tất.");
+        System.out.println("[OK] Worker Thread Pool đã dừng hoàn tất.");
     }
 
     /**

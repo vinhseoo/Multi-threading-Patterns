@@ -31,8 +31,9 @@ public class VirtualThreadServer extends BaseHttpServer {
 
     public VirtualThreadServer(ServerConfig config, HttpHandler handler) {
         super(config, handler);
-        // Khởi tạo Executor cấp phát Virtual Thread cho mỗi tác vụ kết nối
-        this.virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();
+        // Khởi tạo Executor cấp phát Virtual Thread với tên định danh rõ ràng
+        java.util.concurrent.ThreadFactory factory = Thread.ofVirtual().name("VirtualThread-", 1).factory();
+        this.virtualExecutor = Executors.newThreadPerTaskExecutor(factory);
     }
 
     @Override
@@ -64,6 +65,6 @@ public class VirtualThreadServer extends BaseHttpServer {
             virtualExecutor.shutdownNow();
             Thread.currentThread().interrupt();
         }
-        System.out.println("[✓] Virtual Thread Executor đã dừng hoàn tất.");
+        System.out.println("[OK] Virtual Thread Executor đã dừng hoàn tất.");
     }
 }

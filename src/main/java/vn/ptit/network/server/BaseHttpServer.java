@@ -53,6 +53,18 @@ public abstract class BaseHttpServer {
      */
     protected abstract void dispatchClient(Socket socket);
 
+    public int getQueueSize() {
+        return 0;
+    }
+
+    public int getActiveWorkers() {
+        return 0;
+    }
+
+    public int getQueueCapacity() {
+        return config != null ? config.getQueueCapacity() : 0;
+    }
+
     /**
      * Khởi động ServerSocket và bắt đầu vòng lặp tiếp nhận kết nối (Accept Loop).
      */
@@ -61,12 +73,12 @@ public abstract class BaseHttpServer {
         running = true;
 
         System.out.println("=================================================================");
-        System.out.println(" 🌐 [T45 SERVER STARTED]");
-        System.out.println(" 📌 Mô hình luồng: Mode " + getModeNumber() + " - " + getModeName());
-        System.out.println(" 📍 Địa chỉ lắng nghe: http://localhost:" + config.getPort());
-        System.out.println(" 📊 Web Dashboard:    http://localhost:" + config.getPort() + "/dashboard");
-        System.out.println(" 📈 Metrics API:       http://localhost:" + config.getPort() + "/api/metrics");
-        System.out.println(" ⚙️ TCP Backlog: " + config.getBacklog() + " | Core/Max Pool: " +
+        System.out.println(" [+] [T45 SERVER STARTED]");
+        System.out.println("  * Mô hình luồng:    Mode " + getModeNumber() + " - " + getModeName());
+        System.out.println("  * Địa chỉ lắng nghe: http://localhost:" + config.getPort());
+        System.out.println("  * Web Dashboard:     http://localhost:" + config.getPort() + "/dashboard");
+        System.out.println("  * Metrics API:        http://localhost:" + config.getPort() + "/api/metrics");
+        System.out.println("  * TCP Backlog: " + config.getBacklog() + " | Core/Max Pool: " +
                 config.getCorePoolSize() + "/" + config.getMaxPoolSize());
         System.out.println("=================================================================");
 
@@ -106,7 +118,7 @@ public abstract class BaseHttpServer {
                 System.err.println("[Error closing server socket] " + e.getMessage());
             }
         }
-        System.out.println("[✓] Máy chủ đã dừng an toàn.");
+        System.out.println("[OK] Máy chủ đã dừng an toàn.");
     }
 
     /**

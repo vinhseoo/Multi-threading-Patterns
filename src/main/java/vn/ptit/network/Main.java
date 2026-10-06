@@ -86,7 +86,7 @@ public class Main {
         System.out.println("  [3] Mode 3: Worker Thread Pool Server (Fixed Pool 16 + Bounded Queue 1000)");
         System.out.println("  [4] Mode 4: Virtual Thread Server (Java 21 Project Loom) [Khuyên Dùng]");
         System.out.println("  [5] Mode 5: Custom Thread Pool Server (Tự cài đặt Blocking Queue & Workers)");
-        System.out.print("👉 Nhập lựa chọn (1-5, bấm Enter để chọn mặc định [4]): ");
+        System.out.print(" -> Nhap lua chon (1-5, Enter mac dinh [4]): ");
 
         try {
             Scanner scanner = new Scanner(System.in);

@@ -53,12 +53,12 @@ public class JavaLoadTester {
 
     public static BenchmarkResult runBenchmark(String targetUrl, int concurrency, int totalRequests, String modeName, String csvOutput) {
         System.out.println("===========================================================================");
-        System.out.println(" 🚀 [T45 BENCHMARK TOOL] JAVA 21 VIRTUAL THREADS LOAD GENERATOR");
+        System.out.println(" [+] [T45 BENCHMARK TOOL] JAVA 21 VIRTUAL THREADS LOAD GENERATOR");
         System.out.println("===========================================================================");
-        System.out.println(" 🎯 Mục tiêu URL:         " + targetUrl);
-        System.out.println(" 👥 Kết nối đồng thời:    " + concurrency + " concurrent clients");
-        System.out.println(" 📦 Tổng số requests:     " + totalRequests + " requests");
-        System.out.println(" 🏷️ Mô hình kiểm thử:     " + modeName);
+        System.out.println("  * Mục tiêu URL:         " + targetUrl);
+        System.out.println("  * Kết nối đồng thời:    " + concurrency + " concurrent clients");
+        System.out.println("  * Tổng số requests:     " + totalRequests + " requests");
+        System.out.println("  * Mô hình kiểm thử:     " + modeName);
         System.out.println("---------------------------------------------------------------------------");
         System.out.println(" [*] Đang khởi tạo Virtual Thread Client Pool và phát sinh tải...");
 
@@ -170,23 +170,23 @@ public class JavaLoadTester {
 
     private static void printResults(BenchmarkResult r) {
         System.out.println("\n===========================================================================");
-        System.out.println(" 📊 KẾT QUẢ ĐO ĐẠC HIỆU NĂNG (BENCHMARK RESULTS)");
+        System.out.println(" [*] KẾT QUẢ ĐO ĐẠC HIỆU NĂNG (BENCHMARK RESULTS)");
         System.out.println("===========================================================================");
-        System.out.printf(" ⏱️ Tổng thời gian chạy:   %.2f giây\n", r.totalTimeSec);
-        System.out.printf(" ⚡ Thông lượng (Throughput): %.2f Requests/giây (RPS)\n", r.rps);
+        System.out.printf("  * Tổng thời gian chạy:      %.2f giây\n", r.totalTimeSec);
+        System.out.printf("  * Thông lượng (Throughput): %.2f Requests/giây (RPS)\n", r.rps);
         System.out.println("---------------------------------------------------------------------------");
-        System.out.printf(" ✅ Requests thành công:    %d / %d (%.1f%%)\n",
+        System.out.printf("  [OK] Requests thành công:   %d / %d (%.1f%%)\n",
                 r.successRequests, r.totalRequests, (r.successRequests * 100.0 / r.totalRequests));
-        System.out.printf(" ❌ Requests thất bại/lỗi:  %d (%.1f%%)\n",
+        System.out.printf("  [ERR] Requests lỗi:         %d (%.1f%%)\n",
                 r.failedRequests, (r.failedRequests * 100.0 / r.totalRequests));
         System.out.println("---------------------------------------------------------------------------");
-        System.out.println(" 📈 Phân bố độ trễ mạng (Latency Distribution):");
-        System.out.printf("    - Min Latency:          %d ms\n", r.minLatencyMs);
-        System.out.printf("    - Avg Latency:          %.2f ms\n", r.avgLatencyMs);
-        System.out.printf("    - Median (P50):         %d ms\n", r.p50LatencyMs);
-        System.out.printf("    - 95th Percentile (P95):%d ms\n", r.p95LatencyMs);
-        System.out.printf("    - 99th Percentile (P99):%d ms\n", r.p99LatencyMs);
-        System.out.printf("    - Max Latency:          %d ms\n", r.maxLatencyMs);
+        System.out.println("  * Phân bố độ trễ mạng (Latency Distribution):");
+        System.out.printf("    - Min Latency:             %d ms\n", r.minLatencyMs);
+        System.out.printf("    - Avg Latency:             %.2f ms\n", r.avgLatencyMs);
+        System.out.printf("    - Median (P50):            %d ms\n", r.p50LatencyMs);
+        System.out.printf("    - 95th Percentile (P95):   %d ms\n", r.p95LatencyMs);
+        System.out.printf("    - 99th Percentile (P99):   %d ms\n", r.p99LatencyMs);
+        System.out.printf("    - Max Latency:             %d ms\n", r.maxLatencyMs);
         System.out.println("===========================================================================\n");
     }
 
