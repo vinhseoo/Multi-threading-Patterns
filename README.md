@@ -54,6 +54,7 @@ Multi-threading-Patterns/
 ├── lib/
 │   └── lombok.jar                              # Thư viện Lombok phục vụ compile độc lập
 ├── docs/
+│   ├── architecture-and-execution-flow.md     # Bản đặc tả kiến trúc & luồng hoạt động chi tiết 5 Mode
 │   ├── presentation-outline.md                # Đề cương Slide thuyết trình 15-20 phút (18 slides)
 │   ├── demo-script.md                         # Kịch bản Live Demo 5.5 phút bấm giờ từng thao tác
 │   └── qa-defense-guide.md                    # Cẩm nang giải trình 7 câu hỏi phản biện tầng sâu của thầy Hùng
@@ -153,6 +154,7 @@ Dữ liệu đo đạc thực tế thu thập bằng công cụ `JavaLoadTester`
 
 ## 📚 TÀI LIỆU PHỤC VỤ BÁO CÁO & BẢO VỆ ĐỒ ÁN
 
+* 📘 **[Kiến trúc & Luồng hoạt động chi tiết 5 Mode](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/architecture-and-execution-flow.md)**: Bản đặc tả kỹ thuật chi tiết từ script `.bat`, tiếp nhận tham số, cơ chế điều phối socket của từng mode đến HTTP/1.1 và Lock-free metrics.
 * 📑 **[Đề cương Slide thuyết trình 15-20 phút](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/presentation-outline.md)**: Chi tiết 18 slides chuẩn barem chấm điểm của PTIT.
 * ⏱️ **[Kịch bản Live Demo 5.5 phút](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/demo-script.md)**: Bấm giờ chi tiết từng câu thoại, từng thao tác mở tab và click demo.
 * 🛡️ **[Cẩm nang phản biện Q&A](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/qa-defense-guide.md)**: Bí kíp trả lời 7 câu hỏi tầng sâu hệ điều hành và concurrency của TS. Đặng Ngọc Hùng.
