@@ -75,64 +75,57 @@
 
 ---
 
-### SLIDE 6: Mode 1 - Single-Threaded Iterative Server (Baseline)
-* **Nguyên lý:** Vòng lặp `serverSocket.accept()` -> `handleClient()` -> `close()` trên 1 luồng duy nhất.
-* **Bản chất tầng mạng:** Khi luồng bận xử lý Client A (ví dụ delay 150ms), các kết nối từ Client B, C, D... bị giam trong **OS TCP Backlog Queue**.
-* **Đánh giá:** Làm mốc đối chứng (Baseline) chứng minh sự sụp đổ khi có tải đồng thời.
+### SLIDE 6: Mode 1 - Mô Hình Đơn Luồng Xử Lý Tuần Tự (Baseline)
+* **Quy trình 3 bước trực quan:**
+  * Bước 1: Mở cửa đón kết nối đầu tiên.
+  * Bước 2: Phục vụ trọn gói (đọc yêu cầu, tính toán hoặc chờ cơ sở dữ liệu). Trong suốt thời gian này, cửa ra vào bị khóa chặt!
+  * Bước 3: Đóng kết nối, sau đó mới quay lại đón người tiếp theo.
+* **Bản chất hiện tượng nghẽn mạng:** 29 khách còn lại bị giam lỏng ngoài hành lang (hàng đợi mạng TCP Backlog của Hệ điều hành). 30 yêu cầu delay 100ms mất tới 3.0 giây tuần tự. Thông lượng sụp đổ chỉ còn ~9.8 yêu cầu/giây.
 
 ---
 
-### SLIDE 7: Mode 2 - Thread-per-Connection Server
-* **Nguyên lý:** Mỗi khi `accept()` một socket, lập tức khởi tạo `new Thread(...).start()`.
-* **Ưu điểm:** Khử nghẽn tuần tự của Mode 1, các client chạy độc lập.
-* **Tử huyệt kỹ thuật:** Khi bị bắn tải đột biến (Spike 2,000+ conn), hệ thống ném ngoại lệ:
-  `java.lang.OutOfMemoryError: unable to create new native thread` làm crash toàn bộ tiến trình.
+### SLIDE 7: Mode 2 - Mỗi Kết Nối Một Luồng Riêng Biệt
+* **Ý tưởng & Lợi ích:** Cứ có 1 kết nối đến ➔ Lập tức tạo riêng 1 nhân viên mới phục vụ riêng. 30 khách được 30 nhân viên xử lý song song, hoàn tất đồng loạt chỉ trong 115 mili-giây (~285 yêu cầu/giây).
+* **Cái bẫy bùng nổ tài nguyên (Tại sao không thể mở rộng?):**
+  * Số lượng luồng hệ điều hành tăng vọt bám sát số lượng kết nối mạng (Đường Đỏ dính chặt Đường Xanh).
+  * Mỗi luồng ngốn 1 phòng riêng 1MB RAM. Khi có hàng nghìn kết nối ➔ Cạn kiệt bộ nhớ, máy chủ bị sập ngay lập tức.
+  * Hệ điều hành kiệt quệ vì phải liên tục tráo đổi thanh ghi giữa hàng nghìn luồng.
 
 ---
 
-### SLIDE 8: Mode 3 - Worker Thread Pool Server (Chuẩn Doanh Nghiệp)
-* **Mô hình Producer - Consumer:**
-  * **Producer:** Luồng `Acceptor` chỉ chuyên lắng nghe mạng và đẩy socket vào Queue.
-  * **Consumer:** $N_{workers}$ luồng thợ liên tục tranh chấp an toàn để rút task ra xử lý.
-* **Công thức tính số Worker tối ưu:**
-  * CPU-bound: $N = N_{cpu} + 1$ (tránh lãng phí context switch).
-  * I/O-bound: $N = N_{cpu} \times (1 + \frac{W}{C})$.
+### SLIDE 8: Mode 3 - Đội Ngũ Nhân Viên Cố Định & Hàng Ghế Chờ (Chuẩn Doanh Nghiệp)
+* **Mô hình Nhà hàng chuyên nghiệp (Producer - Consumer):**
+  * 1 Nhân viên Lễ tân (Acceptor): Chỉ chuyên đứng cửa tiếp nhận kết nối và phát số thứ tự vào hàng ghế chờ.
+  * Hàng ghế chờ có giới hạn (1,000 chỗ): Lưu giữ các yêu cầu đang đợi tới lượt một cách trật tự.
+  * Đội ngũ 16 Nhân viên cố định (16 Workers): Tuyển sẵn từ đầu, luân phiên lấy việc từ hàng ghế chờ ra xử lý.
+* **Lợi ích kiểm soát:** Dù có 500 hay 1,000 khách ồ ạt tràn vào, số luồng hệ điều hành luôn được chặn cứng ở mức 16 luồng cố định, bảo vệ máy chủ an toàn tuyệt đối.
 
 ---
 
-### SLIDE 9: Cơ Chế Bounded Queue & Backpressure (Chống Sập)
-* **Kích thước hàng đợi có giới hạn:** `ArrayBlockingQueue(1000)`.
-* **Chính sách từ chối (Rejection Policies):**
-  * `AbortPolicy`: Trả về ngay mã HTTP `503 Service Unavailable` kèm header `Retry-After: 2` (Fail-fast tự bảo vệ).
-  * `CallerRunsPolicy`: Luồng Acceptor tự chạy task, tạm dừng gọi `accept()`, tạo ra **áp lực ngược (Backpressure)** tự nhiên làm chậm tốc độ nhận kết nối.
+### SLIDE 9: Cơ Chế Hàng Ghế Chờ Giới Hạn & Van Xả An Toàn (Backpressure)
+* **Nguy cơ của hàng chờ vô hạn:** Nếu cho xếp hàng vô tận, bộ nhớ sẽ phình to cho đến khi nổ tung (tràn bộ nhớ sập máy chủ).
+* **Giải pháp Van xả an toàn (Backpressure):**
+  * Đặt giới hạn trần 1,000 chỗ chờ.
+  * Khi hàng chờ chạm ngưỡng 1,000 ➔ Kích hoạt van xả an toàn: Lịch sự từ chối ngay lập tức và hẹn quay lại sau (Mã HTTP 503 Service Unavailable).
+  * Ý nghĩa: Máy chủ chủ động từ chối an toàn các yêu cầu vượt ngưỡng để bảo vệ 100% các khách hàng đang được phục vụ bên trong.
 
 ---
 
-### SLIDE 10: [INNOVATION 30%] Custom Thread Pool & Bounded Queue Tự Lập Trình
-* **Mục tiêu:** Không dựa dẫm vào bất kỳ class nào trong `java.util.concurrent.*`, tự xây dựng 100% từ đầu:
-  * **`CustomBlockingQueue.java`**: Hàng đợi chặn Bounded Circular Buffer $O(1)$ tự code:
-    - Mảng vòng tròn (`Object[] items`, `putIndex`, `takeIndex`, `count`).
-    - Monitor Pattern với `synchronized`, `wait()` và `notifyAll()`.
-    - Non-blocking `offer()`: Khi đầy 1,000 tasks trả về `false` ngay để kích hoạt HTTP 503 Rejection.
-    - Blocking `take()`: Worker tự động `wait()` ngủ đông khi hàng đợi rỗng.
-  * **`CustomWorker.java`**: Luồng thợ sống lâu kế thừa trực tiếp từ `Thread`, chạy vòng lặp vô tận tiêu thụ task.
-  * **`CustomThreadPool.java`**: Quản lý danh sách 16 Workers, Graceful Shutdown và đo lường active count.
-* **Giá trị khoa học:** Chứng minh năng lực làm chủ cấu trúc dữ liệu Producer-Consumer và đồng bộ hóa tầng thấp.
+### SLIDE 10: [INNOVATION 30%] Mode 5 - Tự Thiết Kế Thread Pool Từ Con Số 0
+* **3 Trụ cột kỹ thuật tự lập trình (Không dùng thư viện có sẵn):**
+  1. **Băng chuyền xoay vòng $O(1)$:** Hàng đợi hoạt động như băng chuyền sushi hình tròn khép kín. Đặt việc vào một đầu và lấy việc ra ở đầu đối diện liên tục, tốc độ xử lý tức thì không phải dịch chuyển mảng.
+  2. **Cơ chế Thức giấc & Ngủ đông:** Có việc mới thì lập tức đánh thức công nhân dậy làm; hết việc trên băng chuyền thì công nhân tự động đi ngủ đông để tiết kiệm 100% năng lực CPU.
+  3. **Quản lý vòng đời & Dừng an toàn:** Điều phối 16 công nhân, hỗ trợ dừng mềm dẻo (đợi các việc đang làm dở hoàn tất trọn vẹn mới nghỉ).
+* **Giá trị khoa học:** Chứng minh năng lực làm chủ thuật toán và cấu trúc dữ liệu đa luồng tầng thấp.
 
 ---
 
-### SLIDE 11: Mode 4 - Modern Concurrency: Java 21 Virtual Threads (Loom)
-* **Khái niệm:** Virtual Threads là luồng ảo chạy ở không gian người dùng (User-space), được JVM quản lý.
-* **Cơ chế Mount / Unmount kỳ diệu:**
-  ```
-  [ Virtual Thread ] ──(Chạy tính toán)──> [ Carrier OS Thread ] (Gắn / Mounted)
-           │
-           ▼ (Gặp I/O Blocking: read socket, Thread.sleep)
-  [ JVM Unmounts VT ] ──> Lưu Stack vào Heap ──> Carrier OS Thread rảnh tiếp nhận VT khác
-           │
-           ▼ (Socket có tín hiệu dữ liệu sẵn sàng)
-  [ JVM Mounts VT ]  ──> Nạp lại Call Stack  ──> Tiếp tục thực thi liền mạch
-  ```
+### SLIDE 11: Mode 4 - Đỉnh Cao Java 21 Virtual Threads (Project Loom)
+* **Cơ chế "Bàn làm việc dùng chung" (Mount / Unmount luồng ảo):**
+  * Giai đoạn 1 (Làm việc): Luồng ảo siêu nhẹ được gắn vào một lõi xử lý vật lý để tính toán.
+  * Giai đoạn 2 (Tạm nghỉ khi chờ đợi - Unmount): Khi luồng ảo gặp thao tác phải chờ (đọc mạng, truy vấn CSDL, delay), máy ảo tự động nhấc luồng này ra cất gọn vào bộ nhớ và nhường ngay lõi xử lý cho luồng khác vào làm việc.
+  * Giai đoạn 3 (Quay lại liền mạch - Mount): Khi mạng có dữ liệu, luồng ảo được đặt lại lên một lõi xử lý đang rảnh để chạy tiếp như chưa hề bị ngắt!
+* **Tại sao đạt hiệu năng kỷ lục?** Mỗi luồng ảo chỉ tốn vài trăm Bytes (nhẹ hơn hàng nghìn lần so với luồng hệ điều hành). Đạt thông lượng kỷ lục ~1,145+ yêu cầu/giây với độ trễ siêu thấp dưới 75ms.
 
 ---
 
@@ -154,14 +147,20 @@
 
 ---
 
-### SLIDE 14: LIVE DEMO (5.5 PHÚT)
-*(Chuyển sang màn hình trình duyệt `http://localhost:8080/dashboard` - Xem chi tiết trong file `demo-script.md`)*
-* Bước 1: Giới thiệu Dashboard & baseline tài nguyên.
-* Bước 2: Đối chứng Single-thread vs Đa luồng qua `/api/delay`.
-* Bước 3: Thử thách tải cao C1000 và kiểm soát tài nguyên Mode 3.
-* Bước 3.5: Trình diễn Mode 5 tự lập trình và mở mã nguồn `CustomBlockingQueue.java`.
-* Bước 4: Đỉnh cao Virtual Threads xử lý nghìn kết nối mà OS Threads vẫn phẳng lì.
-* Bước 5: Phân tích bảng ma trận đối sánh và sắp xếp lịch sử kiểm thử.
+### SLIDE 14: LIVE DEMO THỰC CHIẾN (5.5 — 6 PHÚT)
+*(Chuyển sang màn hình trình duyệt `http://localhost:8080/dashboard` - Chi tiết xem tại [demo-script.md](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/demo-script.md))*
+* **Bước 1 (00:00):** Giới thiệu kiến trúc Dashboard: 6 thẻ KPI, 4 biểu đồ Native Canvas 60fps, cơ chế Polling chu kỳ 500ms không reload.
+* **Bước 1.5 (01:00):** Kiểm thử 3 tính chất tải qua Demo Control Center:
+  - `GET /api/hello` (Pure I/O): Phản hồi < 1ms, in định danh Thread và cờ `[Loom Virtual]`.
+  - `GET /api/delay` (I/O-Bound): Mô phỏng trễ Database/Network 150ms.
+  - `GET /api/compute` (CPU-Bound): Đẩy CPU lên cao trên Biểu đồ 4 để phân biệt bản chất tối ưu I/O của Virtual Threads.
+* **Bước 2 (01:30):** Đối chứng Mode 1 (Nghẽn TCP Backlog, latency ~3s) vs Mode 2 (Tăng vọt 30 luồng, Đường Đỏ dính chặt Đường Xanh).
+* **Bước 3 (02:45):** Thử thách tải cao C1000 và kích hoạt Mode 3:
+  - Khóa cứng OS Threads ở 16 luồng cố định.
+  - Cơ chế Backpressure: Tự bảo vệ bằng HTTP 503 Service Unavailable khi hàng đợi đầy.
+* **Bước 3.5 (04:00):** [30% Depth] Trình diễn Mode 5 Custom Thread Pool tự lập trình: Mở trực tiếp mã nguồn `CustomBlockingQueue.java` (Circular Array $O(1)$) và `CustomWorker.java` (`wait()`/`notifyAll()`).
+* **Bước 4 (04:45):** Đỉnh cao Java 21 Virtual Threads (Mode 4): Bắn 1,000 clients, Active Connections vọt đỉnh nhưng OS Threads hoàn toàn phẳng lì ở 15-16 Carrier Threads, RPS đạt ~1,145+.
+* **Bước 5 (05:30):** Bảng ma trận đối sánh Benchmark, đồ thị cột trực quan, tính năng Sort lịch sử test và tải file CSV.
 
 ---
 

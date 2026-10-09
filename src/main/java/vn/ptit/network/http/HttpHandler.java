@@ -36,6 +36,10 @@ public class HttpHandler {
                 case "/dashboard":
                     return handleDashboard();
 
+                case "/slides":
+                case "/slides.html":
+                    return handleSlides();
+
                 case "/api/hello":
                     return handleHello(request);
 
@@ -255,11 +259,28 @@ public class HttpHandler {
         return HttpResponse.okHtml("<h1>T45 Server Running</h1><p>Vui lòng kiểm tra file static tại src/main/resources/web/index.html</p>");
     }
 
+    private HttpResponse handleSlides() {
+        HttpResponse res = tryServeStaticResource("web/slides.html");
+        if (res != null) return res;
+        res = tryServeStaticResource("slides.html");
+        if (res != null) return res;
+
+        File directDocs = new File("docs/slides.html");
+        if (directDocs.exists() && directDocs.isFile()) {
+            try {
+                return HttpResponse.okHtml(Files.readString(directDocs.toPath()));
+            } catch (Exception ignored) {}
+        }
+
+        return HttpResponse.okHtml("<h1>T45 Presentation Slides</h1><p>Vui lòng kiểm tra file tại docs/slides.html</p>");
+    }
+
     private HttpResponse tryServeStaticResource(String resourcePath) {
         String cleanPath = resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath;
         if (cleanPath.equals("style.css")) cleanPath = "web/style.css";
         if (cleanPath.equals("dashboard.js")) cleanPath = "web/dashboard.js";
         if (cleanPath.equals("index.html")) cleanPath = "web/index.html";
+        if (cleanPath.equals("slides.html")) cleanPath = "web/slides.html";
 
         byte[] bytes = null;
 

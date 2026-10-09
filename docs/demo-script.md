@@ -30,7 +30,7 @@
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Mode 1**<br>Iterative Single-Thread | `.\run_server.bat 1` | `Mode 1: Iterative...`<br>*(Xám: Đơn luồng tuần tự)* | `⚡ Burst 30 Reqs (Delay 100ms)` | - **RPS:** ~9.8 RPS (Cực thấp)<br>- **Latency:** ~2,500ms - 3,000ms<br>- **OS Threads:** Giữ nguyên 7-10 luồng | **CẢ 2 ĐƯỜNG ĐỀU PHẲNG LÌ:**<br>- **Đường Xanh (Conns):** Giữ nguyên ở mức **1** (chỉ accept 1 kết nối tại 1 thời điểm).<br>- **Đường Đỏ (Threads):** Giữ nguyên **7-10 luồng**. | In ra lần lượt từng dòng rất chậm:<br>`[✓] HTTP 200 trong ...ms [Thread: main]` |
 | **Mode 2**<br>Thread-per-Conn | `.\run_server.bat 2` | `Mode 2: Thread-per-Conn...`<br>*(Đỏ: 1 Thread Per Socket)* | `⚡ Burst 30 Reqs (Delay 100ms)`<br>Hoặc `🚀 Spike 100 Reqs` | - **RPS:** Vọt lên 250 - 280 RPS<br>- **Latency:** Xong ngay trong **110ms - 130ms**!<br>- **OS Threads:** **Tăng vọt thêm 30 - 100 luồng!** | **Đường Xanh (Conns) và Đường Đỏ (Threads) DÍNH CHẶT VÀO NHAU cùng nhảy vọt lên đỉnh!** | Bắn ra đồng loạt 30 dòng cùng lúc:<br>`[✓] HTTP 200 trong 115ms [Thread: ThreadPerConn-1]`<br>`[Thread: ThreadPerConn-2]...` |
-| **Mode 3**<br>Worker Thread Pool | `.\run_server.bat 3` | `Mode 3: Worker Thread Pool...`<br>*(Vàng: Queue: 0/1000 \| Workers: 16/16)* | Click nút cam:<br>**`🔥 Benchmark 500 Clients`**<br>*(Hoặc Terminal: run_benchmark.bat)* | - **RPS:** Ổn định ~150 RPS<br>- **Latency:** ~210ms (16 worker chia 2 đợt)<br>- **OS Threads:** **BỊ KHÓA CỨNG Ở 16 LUỒNG!** | **Đường Xanh (Conns)** vọt lên 500,<br>nhưng **Đường Đỏ (Threads)** bị **chặn trần tuyệt đối ở mức 16 luồng**! | Các worker luân phiên tiêu thụ task:<br>`[Thread: WorkerPool-1]`<br>`[Thread: WorkerPool-2]...` |
+| **Mode 3**<br>Worker Thread Pool | `.\run_server.bat 3` | `Mode 3: Worker Thread Pool...`<br>*(Vàng: Queue: 0/1000 \| Workers: 16/16)* | Click nút cam:<br>**`🔥 Benchmark 500 Clients (2,000 Reqs)`**<br>*(Hoặc Terminal: run_benchmark.bat)* | - **RPS:** Ổn định ~150 RPS<br>- **Latency:** ~210ms (16 worker chia 2 đợt)<br>- **OS Threads:** **BỊ KHÓA CỨNG Ở 16 LUỒNG!** | **Đường Xanh (Conns)** vọt lên 500,<br>nhưng **Đường Đỏ (Threads)** bị **chặn trần tuyệt đối ở mức 16 luồng**! | Các worker luân phiên tiêu thụ task:<br>`[Thread: WorkerPool-1]`<br>`[Thread: WorkerPool-2]...` |
 | **Mode 4**<br>Java 21 Virtual Threads | `.\run_server.bat 4` | `Mode 4: Java 21 Virtual Threads...`<br>*(Xanh ngọc: OS Carrier Threads: 16)* | `🚀 Spike 100 Reqs`<br>Hoặc Benchmark 1,000 clients | - **RPS:** **Vọt lên 1,100+ RPS**<br>- **Latency:** Siêu tốc **70ms - 90ms**<br>- **OS Threads:** **HOÀN TOÀN PHẲNG LÌ Ở 15-16 LUỒNG!** | **Đường Xanh (Conns) vọt lên đỉnh chót vót (1,000 conns)**,<br>trong khi **Đường Đỏ (OS Threads) NẰM NGANG PHẲNG LÌ** dưới đáy! | In ra hàng loạt luồng ảo siêu nhẹ:<br>`[✓] HTTP 200 trong 72ms [Thread: VirtualThread-1] [Loom Virtual]` |
 | **Mode 5**<br>Custom Thread Pool *(30% Depth)* | `.\run_server.bat 5` | `Mode 5: Custom Thread Pool...`<br>*(Tím: Queue: 0/1000 \| Workers: 16/16)* | `⚡ Burst 30 Reqs`<br>Hoặc `🔥 Benchmark 500 Clients` | - **RPS:** Ổn định ~148 RPS<br>- **Latency:** ~220ms<br>- **OS Threads:** **BỊ KHÓA CỨNG Ở 16 LUỒNG!** | **Đường Xanh vọt lên, Đường Đỏ chặn cứng ở 16 luồng** (giống Mode 3 nhưng tự viết 100% bằng mảng vòng + wait/notify). | Các worker tự lập trình tiêu thụ task:<br>`[Thread: CustomWorker-1]`<br>`[Thread: CustomWorker-2]...` |
 
@@ -73,7 +73,26 @@
 
 ---
 
-### 📍 PHÂN CẢNH 2: ĐỐI CHỨNG SINGLE-THREAD (MODE 1) VS THREAD-PER-CONNECTION (MODE 2) (01:00 – 02:15)
+### 📍 PHÂN CẢNH 1.5: PHÂN ĐỊNH 3 DẠNG TẢI TRÊN DEMO CONTROL CENTER (PURE I/O vs I/O-BOUND vs CPU-BOUND) (01:00 – 01:30)
+
+#### 1. Thao tác kỹ thuật trên Dashboard:
+Lần lượt click 3 nút test đơn lẻ trên thanh công cụ Demo Control Center:
+1. Click **`🟢 GET /api/hello (1 req - Pure I/O)`**:
+   - Log Console phản hồi tức thì: `[✓] HTTP 200 trong 0ms [Thread: VirtualThread-...] [Loom Virtual]`.
+   - Mục đích: Đo trần thông lượng Network I/O không chịu tải trễ.
+2. Click **`🟡 GET /api/delay?ms=150 (1 req - I/O Bound)`**:
+   - Log Console phản hồi sau 150ms: Mô phỏng gọi Database / API bên thứ ba bằng `Thread.sleep(150)`.
+3. Click **`🔴 GET /api/compute?n=32 (1 req - CPU Bound)`**:
+   - Quan sát **Biểu đồ số 4 (CPU % & RAM)**: Kim CPU nhảy vọt tức thì lên cao do thuật toán đệ quy Fibonacci(32).
+
+#### 2. Lời thoại giải thích bản chất (Ghi điểm lý thuyết sâu):
+> *"Thưa thầy, hệ thống hỗ trợ đo lường cả 3 dạng tải mạng: Pure I/O, I/O-Bound và CPU-Bound.*  
+> *- Với **I/O-Bound** (`/api/delay`): Luồng chủ yếu chờ đợi socket/database, đây chính là 'sân khấu' để Java 21 Virtual Threads phát huy tối đa sức mạnh unmount luồng.*  
+> *- Với **CPU-Bound** (`/api/compute`): Thuật toán đệ quy chiếm dụng 100% chu kỳ xung nhịp CPU, do đó Virtual Threads sẽ không giúp tăng tốc độ xử lý hơn so với số core vật lý có sẵn."*
+
+---
+
+### 📍 PHÂN CẢNH 2: ĐỐI CHỨNG SINGLE-THREAD (MODE 1) VS THREAD-PER-CONNECTION (MODE 2) (01:30 – 02:45)
 
 #### 1. Bước A: Chạy Mode 1 (Single-Threaded Iterative Server)
 - **Thao tác:**
@@ -121,7 +140,7 @@
 
 ---
 
-### 📍 PHÂN CẢNH 3: THỬ THÁCH GIỚI HẠN TẢI CAO (C1000 STRESS) & WORKER THREAD POOL (02:15 – 03:45)
+### 📍 PHÂN CẢNH 3: THỬ THÁCH GIỚI HẠN TẢI CAO (C1000 STRESS) & WORKER THREAD POOL (02:45 – 04:00)
 
 #### 1. Bước A: Phơi bày tử huyệt của Mode 2 dưới tải lớn
 - **Thao tác:**
@@ -142,13 +161,15 @@
   - Quan sát Header Dashboard: Hiển thị ngay badge màu vàng:  
     `📦 Queue: 0/1000 | Workers: 16/16`.
   - Tại mục **🎮 DEMO CONTROL CENTER**, click trực tiếp nút cam:  
-    👉 **`🔥 Benchmark 500 Clients (1,000 Reqs)`**  
-    *(Máy chủ sẽ tự động gọi ngầm `JavaLoadTester` phát động 500 luồng TCP đồng thời bắn vào máy chủ mà bạn không cần mở terminal gõ tay!)*
+    👉 **`🔥 Benchmark 500 Clients (2,000 Reqs)`**  
+    *(Máy chủ sẽ tự động gọi ngầm `JavaLoadTester` phát động 500 luồng TCP đồng thời bắn 2,000 requests vào máy chủ mà bạn không cần mở terminal gõ tay!)*
 - **Hiện tượng kiểm soát tài nguyên tuyệt đối cần chỉ cho thầy xem:**
   1. **Thẻ KPI OS Native Threads:** Con số **bị khóa cứng ở mức 16 luồng cố định** (cộng vài luồng nền JVM là ~26 luồng), tuyệt đối không bao giờ vượt quá!
   2. **Huy hiệu Queue trên Header:** Nhảy số phản ánh tác vụ xếp hàng trong Bounded ArrayBlockingQueue và được 16 Worker Threads tiêu thụ nhịp nhàng.
   3. **Biểu đồ số 3:** Đường xanh lá (Connections) vọt lên 100-500, nhưng **đường đỏ OS Threads nằm ngang chặn trần ở mức 16 luồng**!
   4. **Log Console:** Tên luồng quay vòng có kiểm soát: `[Thread: WorkerPool-1]`, `[Thread: WorkerPool-2]`... `[Thread: WorkerPool-16]`.
+  5. **Minh họa cơ chế Backpressure (HTTP 503 Rejection):**
+     - Giải thích: Nếu hàng đợi 1,000 tasks bị tràn, máy chủ kích hoạt `sendServiceUnavailable()` trả về ngay mã HTTP 503 Service Unavailable để bảo vệ hệ thống khỏi sập bộ nhớ. Thẻ KPI hiển thị số lượng requests lỗi tăng lên mà tiến trình JVM vẫn sống an toàn!
 
 #### 3. Lời thoại trình bày:
 > *"Thưa thầy, để khắc phục triệt để nguy cơ sập bộ nhớ và nghẽn CPU của Mode 2, ở **Mode 3 - Worker Thread Pool**, em đã áp dụng mẫu thiết kế Producer-Consumer chuẩn doanh nghiệp:*  
@@ -158,7 +179,7 @@
 
 ---
 
-### 📍 PHÂN CẢNH 3.5: [INNOVATION 30%] CHỨNG MINH ĐỘ SÂU KỸ THUẬT VỚI CUSTOM THREAD POOL & BOUNDED QUEUE (MODE 5) (03:45 – 04:30)
+### 📍 PHÂN CẢNH 3.5: [INNOVATION 30%] CHỨNG MINH ĐỘ SÂU KỸ THUẬT VỚI CUSTOM THREAD POOL & BOUNDED QUEUE (MODE 5) (04:00 – 04:45)
 
 #### 1. Thao tác kỹ thuật:
 - Tại Terminal 1, bấm `Ctrl + C`, khởi động **Mode 5** (Chế độ tự lập trình 100% không dùng thư viện ngoài):
@@ -188,7 +209,7 @@
 
 ---
 
-### 📍 PHÂN CẢNH 4: ĐỈNH CAO JAVA 21 PROJECT LOOM VIRTUAL THREADS (04:30 – 05:30)
+### 📍 PHÂN CẢNH 4: ĐỈNH CAO JAVA 21 PROJECT LOOM VIRTUAL THREADS (04:45 – 05:30)
 
 #### 1. Thao tác kỹ thuật:
 - Tại Terminal 1, chuyển sang **Mode 4**:

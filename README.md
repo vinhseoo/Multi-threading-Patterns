@@ -154,6 +154,7 @@ Dữ liệu đo đạc thực tế thu thập bằng công cụ `JavaLoadTester`
 
 ## 📚 TÀI LIỆU PHỤC VỤ BÁO CÁO & BẢO VỆ ĐỒ ÁN
 
+* 🖥️ **[Bộ Slide Thuyết Trình HTML5 Mẫu Sáng 16:9](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/slides.html)**: 18 slides chuẩn mực, độ tương phản cao, hỗ trợ phím tắt, xem danh mục (O), và xuất PDF (P) để import vào Canva/PowerPoint.
 * ⚡ **[Hướng dẫn Demo nhanh 5 Mode](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/demo-modes-guide.md)**: Cẩm nang thực chiến ngắn gọn hướng dẫn chạy từng mode, thao tác nút bấm Dashboard và quan sát hiện tượng.
 * 📘 **[Kiến trúc & Luồng hoạt động chi tiết 5 Mode](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/architecture-and-execution-flow.md)**: Bản đặc tả kỹ thuật chi tiết từ script `.bat`, tiếp nhận tham số, cơ chế điều phối socket của từng mode đến HTTP/1.1 và Lock-free metrics.
 * 📑 **[Đề cương Slide thuyết trình 15-20 phút](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/presentation-outline.md)**: Chi tiết 18 slides chuẩn barem chấm điểm của PTIT.
