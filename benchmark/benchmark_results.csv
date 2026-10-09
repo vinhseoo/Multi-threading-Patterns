@@ -18,3 +18,4 @@ Timestamp,Mode,TargetUrl,Concurrency,TotalReqs,SuccessReqs,FailedReqs,TotalTimeS
 2026-10-06 11:54:13,"Mode 4 (Java 21 Virtual Threads (Project Loom))","http://localhost:8080/api/delay?ms=100",500,2000,2000,0,4.17,479.87,121,393.91,150,1325,1632,1671
 2026-10-06 11:54:25,"Mode 4 (Java 21 Virtual Threads (Project Loom))","http://localhost:8080/api/delay?ms=100",500,2000,2000,0,3.85,519.71,118,376.58,145,1201,1529,1647
 2026-10-06 14:57:32,"Mode 5 (Custom Thread Pool Server (Self-implemented Pool))","http://localhost:8080/api/delay?ms=100",500,2000,2000,0,14.84,134.80,383,3061.92,3267,3832,4399,4526
+2026-10-09 09:43:58,"Mode 1 (Iterative Single-Threaded Server (Baseline))","http://localhost:8080/api/delay?ms=100",500,2000,122,1878,25.49,78.46,292,482.92,7943,14294,14858,14977

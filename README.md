@@ -154,8 +154,10 @@ Dữ liệu đo đạc thực tế thu thập bằng công cụ `JavaLoadTester`
 
 ## 📚 TÀI LIỆU PHỤC VỤ BÁO CÁO & BẢO VỆ ĐỒ ÁN
 
+* ⚡ **[Hướng dẫn Demo nhanh 5 Mode](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/demo-modes-guide.md)**: Cẩm nang thực chiến ngắn gọn hướng dẫn chạy từng mode, thao tác nút bấm Dashboard và quan sát hiện tượng.
 * 📘 **[Kiến trúc & Luồng hoạt động chi tiết 5 Mode](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/architecture-and-execution-flow.md)**: Bản đặc tả kỹ thuật chi tiết từ script `.bat`, tiếp nhận tham số, cơ chế điều phối socket của từng mode đến HTTP/1.1 và Lock-free metrics.
 * 📑 **[Đề cương Slide thuyết trình 15-20 phút](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/presentation-outline.md)**: Chi tiết 18 slides chuẩn barem chấm điểm của PTIT.
 * ⏱️ **[Kịch bản Live Demo 5.5 phút](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/demo-script.md)**: Bấm giờ chi tiết từng câu thoại, từng thao tác mở tab và click demo.
 * 🛡️ **[Cẩm nang phản biện Q&A](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/qa-defense-guide.md)**: Bí kíp trả lời 7 câu hỏi tầng sâu hệ điều hành và concurrency của TS. Đặng Ngọc Hùng.
 * 📋 **[Nhật ký tiến độ từng Phase](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/PROJECT_PHASES_LOG.md)**: Theo dõi tiến độ hoàn thành 100% của 5 giai đoạn dự án.
+
