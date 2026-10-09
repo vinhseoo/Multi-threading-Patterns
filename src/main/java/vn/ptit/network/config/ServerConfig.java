@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * Cấu hình tham số hoạt động cho hệ thống máy chủ mạng T45.
- * Được tinh giản tối đa nhờ Lombok annotations (@Data, @Builder, @Accessors(chain = true)).
- */
+
 @Data
 @Builder
 @NoArgsConstructor

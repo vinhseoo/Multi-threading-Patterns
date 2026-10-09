@@ -109,7 +109,6 @@ public class Main {
         System.out.println(" |_|       |_|  |_____|  |_|    |_| \\_|______|  |_|           |______|\\_____||_|\\_\\");
         System.out.println("===========================================================================");
         System.out.println("  ĐỀ TÀI T45: MULTI-THREADING PATTERNS IN NETWORK PROGRAMMING");
-        System.out.println("  Học viện Công nghệ Bưu chính Viễn thông (PTIT) - Giảng viên: TS. Đặng Ngọc Hùng");
         System.out.println("  Sinh viên thực hiện: Solo Project (Java 21 LTS - Loom)");
         System.out.println("===========================================================================\n");
     }

@@ -17,17 +17,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * [PORTABLE BENCHMARK ENGINE]:
- * Công cụ phát sinh tải đồng thời đa luồng được xây dựng 100% bằng Java 21 Standard Library.
- * 
- * Ưu thế vượt trội:
- * - Tận dụng Java 21 Virtual Threads để mô phỏng hàng nghìn Client đồng thời (High-concurrency Load Generator)
- *   mà không gặp giới hạn bộ nhớ OS Thread Stack như các tool truyền thống.
- * - Zero Dependency: Không yêu cầu cài đặt Python, Apache JMeter, hay k6.
- * - Đo đạc độ chính xác micro-giây: RPS, Latency Min, Avg, P50, P95, P99, Max và Tỷ lệ lỗi.
- * - Hỗ trợ xuất trực tiếp dữ liệu ra file CSV để vẽ đồ thị báo cáo BTL.
- */
+
 public class JavaLoadTester {
 
     public static void main(String[] args) {

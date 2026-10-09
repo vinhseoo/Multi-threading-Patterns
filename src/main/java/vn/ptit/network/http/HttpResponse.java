@@ -8,10 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Lớp xây dựng (builder) và gửi phản hồi HTTP/1.1 chuẩn về client.
- * Tận dụng Lombok @Getter cho các thuộc tính trạng thái.
- */
 @Getter
 public class HttpResponse {
     private final int statusCode;
@@ -22,7 +18,6 @@ public class HttpResponse {
     public HttpResponse(int statusCode, String statusText) {
         this.statusCode = statusCode;
         this.statusText = statusText;
-        // Các header mặc định
         setHeader("Server", "T45-MultiThreaded-Server/1.0 (PTIT)");
         setHeader("Connection", "close");
         setHeader("Access-Control-Allow-Origin", "*");
@@ -49,9 +44,6 @@ public class HttpResponse {
         return this;
     }
 
-    /**
-     * Ghi toàn bộ gói tin HTTP xuống OutputStream của Socket.
-     */
     public void writeTo(OutputStream out) throws IOException {
         StringBuilder headerBuilder = new StringBuilder();
         headerBuilder.append("HTTP/1.1 ").append(statusCode).append(" ").append(statusText).append("\r\n");
@@ -72,7 +64,6 @@ public class HttpResponse {
         out.flush();
     }
 
-    // ================= STATIC FACTORIES =================
 
     public static HttpResponse okJson(String json) {
         return new HttpResponse(200, "OK").setBody(json, "application/json");

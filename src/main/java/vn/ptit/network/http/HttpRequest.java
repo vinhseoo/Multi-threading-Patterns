@@ -15,10 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Lớp phân tích cú pháp (parser) gói tin HTTP/1.1 thủ công từ Socket InputStream.
- * Sử dụng Lombok (@Getter, @ToString, @AllArgsConstructor) để tinh giản mã nguồn tối đa.
- */
+
 @Getter
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -31,9 +28,7 @@ public class HttpRequest {
     private final Map<String, String> headers;
     private final String body;
 
-    /**
-     * Phân tích một HTTP Request từ InputStream của Socket.
-     */
+
     public static HttpRequest parse(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
         String requestLine = reader.readLine();

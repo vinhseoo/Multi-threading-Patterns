@@ -15,11 +15,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
-/**
- * Lớp cơ sở trừu tượng quản lý ServerSocket, vòng đời dịch vụ mạng và thu thập số liệu hiệu năng.
- * Cung cấp khung chuẩn hóa để các mô hình luồng (Mode 1, 2, 3, 4, 5) kế thừa và hiện thực hóa
- * chiến lược điều phối luồng (dispatching strategy) riêng biệt.
- */
 public abstract class BaseHttpServer {
     @Getter
     protected final ServerConfig config;
@@ -37,20 +32,10 @@ public abstract class BaseHttpServer {
         this.handler.setServer(this);
     }
 
-    /**
-     * Tên mô hình luồng để hiển thị trên console và dashboard.
-     */
     public abstract String getModeName();
 
-    /**
-     * Số thứ tự mô hình (1, 2, 3, 4, 5).
-     */
     public abstract int getModeNumber();
 
-    /**
-     * Chiến lược điều phối xử lý kết nối client của từng mô hình luồng.
-     * @param socket kết nối vừa được accept() từ mạng
-     */
     protected abstract void dispatchClient(Socket socket);
 
     public int getQueueSize() {
@@ -65,9 +50,6 @@ public abstract class BaseHttpServer {
         return config != null ? config.getQueueCapacity() : 0;
     }
 
-    /**
-     * Khởi động ServerSocket và bắt đầu vòng lặp tiếp nhận kết nối (Accept Loop).
-     */
     public void start() throws IOException {
         serverSocket = new ServerSocket(config.getPort(), config.getBacklog());
         running = true;
@@ -103,9 +85,6 @@ public abstract class BaseHttpServer {
         }
     }
 
-    /**
-     * Dừng máy chủ và giải phóng socket mạng.
-     */
     public synchronized void stop() {
         if (!running) return;
         running = false;
@@ -121,10 +100,6 @@ public abstract class BaseHttpServer {
         System.out.println("[OK] Máy chủ đã dừng an toàn.");
     }
 
-    /**
-     * Xử lý đọc request từ socket, gọi handler và ghi response về client.
-     * Tích hợp đo đạc số liệu hiệu năng (Metrics) tự động và chuẩn xác.
-     */
     protected void processConnection(Socket socket) {
         metrics.recordConnectionOpen();
         long startTime = System.currentTimeMillis();

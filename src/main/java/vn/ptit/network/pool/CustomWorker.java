@@ -4,13 +4,6 @@ import lombok.Getter;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Luồng thợ (Worker Thread) tự cài đặt từ con số 0.
- * Liên tục chạy vòng lặp lấy công việc (Runnable) từ hàng đợi dùng chung và thực thi.
- * 
- * Minh họa nguyên lý luồng sống lâu (Long-lived Thread) giúp tránh chi phí khởi tạo
- * và hủy luồng liên tục của hệ điều hành.
- */
 public class CustomWorker extends Thread {
 
     private final CustomBlockingQueue<Runnable> taskQueue;

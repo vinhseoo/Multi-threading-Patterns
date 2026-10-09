@@ -8,23 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * [MODE 4]: Modern High-Concurrency — Java 21 Virtual Threads (Project Loom).
- * 
- * Đỉnh cao công nghệ luồng hiện đại của Java 21:
- * - Thay vì tạo OS Platform Thread nặng nề (chiếm 1MB Stack bộ nhớ OS), Java 21 đưa vào
- *   Virtual Threads (Luồng ảo) hoạt động ở không gian người dùng (User-space Thread) do JVM quản lý.
- * - Mô hình ánh xạ M:N: Hàng trăm nghìn Virtual Threads được ánh xạ linh hoạt lên một số ít
- *   Carrier Threads (OS Threads, thường bằng số nhân CPU).
- * - Cơ chế Mount / Unmount kỳ diệu:
- *   Khi một Virtual Thread thực hiện thao tác I/O mạng bị chặn (như đọc Socket InputStream hoặc Thread.sleep()),
- *   JVM tự động unmount (tháo gỡ) Virtual Thread đó khỏi Carrier Thread và gán Virtual Thread khác vào chạy tiếp.
- *   Khi Socket có tín hiệu dữ liệu sẵn sàng, Virtual Thread được mount (gắn) trở lại để tiếp tục.
- * - Hiệu quả thực tế:
- *   + Cho phép xử lý 10,000+ đến 100,000+ kết nối đồng thời trên một chiếc laptop thông thường.
- *   + Bộ nhớ tiêu thụ chỉ vài KB mỗi luồng (thay vì 1MB như Platform Thread).
- *   + Lập trình phong cách tuần tự (Blocking I/O) dễ đọc, dễ debug nhưng hiệu năng tiệm cận Non-blocking / Reactive.
- */
 public class VirtualThreadServer extends BaseHttpServer {
 
     private final ExecutorService virtualExecutor;

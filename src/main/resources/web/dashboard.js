@@ -1,10 +1,3 @@
-/**
- * ==========================================================================
- * T45 MULTI-THREADING DASHBOARD - REAL-TIME ENGINE
- * Tự động cập nhật chỉ số mỗi 500ms & vẽ biểu đồ Canvas tốc độ 60fps
- * Không phụ thuộc thư viện ngoài (100% Native Vanilla JS)
- * ==========================================================================
- */
 
 // Cấu hình cửa sổ dữ liệu trượt (Sliding Window Data Points)
 const MAX_DATA_POINTS = 35;

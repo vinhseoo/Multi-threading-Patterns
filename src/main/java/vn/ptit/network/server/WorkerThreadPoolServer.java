@@ -10,20 +10,6 @@ import java.net.Socket;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * [MODE 3]: Worker Thread Pool Server (Chuẩn mực doanh nghiệp - Enterprise Standard).
- * 
- * Đặc điểm kiến trúc:
- * - Khởi tạo sẵn một số lượng Worker Threads cố định (Core Pool Size: 16 luồng).
- * - Sử dụng hàng đợi có giới hạn (Bounded ArrayBlockingQueue, sức chứa 1,000 tasks).
- * - Mô hình Producer - Consumer:
- *   + Acceptor Thread (Producer): Lắng nghe kết nối từ mạng và đẩy Socket vào Queue.
- *   + Worker Threads (Consumers): Nhận task từ Queue và xử lý độc lập.
- * - Cơ chế Backpressure & Rejection Policy (Chính sách từ chối):
- *   + Khi hàng đợi đầy (Queue Full): Server kích hoạt RejectedExecutionHandler để tự bảo vệ.
- *   + Phản hồi ngay mã HTTP 503 Service Unavailable kèm header 'Retry-After: 2'
- *     thay vì để tràn bộ nhớ (Out-Of-Memory) hay làm crash tiến trình.
- */
 public class WorkerThreadPoolServer extends BaseHttpServer {
 
     @Getter

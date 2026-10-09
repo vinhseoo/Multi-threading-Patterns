@@ -6,15 +6,9 @@ import vn.ptit.network.server.BaseHttpServer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-/**
- * Bộ định tuyến (Router) và xử lý logic nghiệp vụ cho các yêu cầu HTTP.
- * Hỗ trợ các kịch bản thực nghiệm: I/O thuần, giả lập I/O-bound (delay), CPU-bound (compute),
- * cung cấp API số liệu hiệu năng /api/metrics và Web Dashboard thời gian thực.
- */
 public class HttpHandler {
 
     @Setter
@@ -24,7 +18,6 @@ public class HttpHandler {
         String path = request.getPath();
         String method = request.getMethod();
 
-        // Xử lý tiền kiểm CORS (Preflight request)
         if ("OPTIONS".equalsIgnoreCase(method)) {
             return new HttpResponse(204, "No Content");
         }
@@ -62,7 +55,6 @@ public class HttpHandler {
                     return tryServeBenchmarkCsv();
 
                 default:
-                    // Thử đọc static resource từ classpath hoặc file system
                     HttpResponse staticRes = tryServeStaticResource(path);
                     if (staticRes != null) {
                         return staticRes;
@@ -152,7 +144,6 @@ public class HttpHandler {
     }
 
     private HttpResponse handleBenchmark() {
-        // Đọc dữ liệu từ file benchmark/benchmark_results.csv nếu có
         StringBuilder historyJson = new StringBuilder("[");
         File csvFile = new File("benchmark/benchmark_results.csv");
         if (csvFile.exists()) {
@@ -174,7 +165,8 @@ public class HttpHandler {
                         ));
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         historyJson.append("]");
 
@@ -203,7 +195,8 @@ public class HttpHandler {
             try {
                 byte[] bytes = Files.readAllBytes(csvFile.toPath());
                 return new HttpResponse(200, "OK").setBodyBytes(bytes, "text/csv; charset=utf-8");
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         return HttpResponse.notFound("benchmark_results.csv not found.");
     }
@@ -215,9 +208,6 @@ public class HttpHandler {
         String targetUrl = request.getQueryParam("url", "http://localhost:" + port + "/api/delay?ms=100");
         String modeName = (server != null) ? ("Mode " + server.getModeNumber() + " (" + server.getModeName() + ")") : "Current Server Mode";
 
-        // Khởi động JavaLoadTester như một Tiến trình Hệ điều hành (Process) độc lập hoàn toàn.
-        // Nhờ tách biệt tiến trình, các luồng HttpClient của Client TUYỆT ĐỐI KHÔNG bị tính vào số luồng của Server!
-        // Server sẽ chỉ hiển thị đúng số luồng Worker của nó (16 luồng cố định ở Mode 3).
         Thread.ofVirtual().name("benchmark-process-launcher").start(() -> {
             try {
                 String jdkPath = "C:\\Users\\maiduc.vinh\\.jdks\\ms-21.0.10\\bin\\java.exe";
@@ -269,7 +259,8 @@ public class HttpHandler {
         if (directDocs.exists() && directDocs.isFile()) {
             try {
                 return HttpResponse.okHtml(Files.readString(directDocs.toPath()));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return HttpResponse.okHtml("<h1>T45 Presentation Slides</h1><p>Vui lòng kiểm tra file tại docs/slides.html</p>");
@@ -284,7 +275,6 @@ public class HttpHandler {
 
         byte[] bytes = null;
 
-        // 1. Thử đọc từ ClassLoader
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(cleanPath)) {
             if (in != null) {
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -295,9 +285,9 @@ public class HttpHandler {
                 }
                 bytes = buffer.toByteArray();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
-        // 2. Thử đọc từ thư mục src/main/resources hoặc target/classes trực tiếp
         if (bytes == null) {
             File directFile = new File("src/main/resources/" + cleanPath);
             if (!directFile.exists()) {
@@ -306,7 +296,8 @@ public class HttpHandler {
             if (directFile.exists() && directFile.isFile()) {
                 try {
                     bytes = Files.readAllBytes(directFile.toPath());
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
@@ -323,9 +314,6 @@ public class HttpHandler {
         return new HttpResponse(200, "OK").setBodyBytes(bytes, contentType);
     }
 
-    /**
-     * Thuật toán Fibonacci đệ quy thuần túy tạo tải CPU tính toán.
-     */
     private long fibonacci(int n) {
         if (n <= 1) return n;
         return fibonacci(n - 1) + fibonacci(n - 2);

@@ -11,12 +11,6 @@ import java.net.Socket;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * [INNOVATION MODE]: Custom Thread Pool Server (Tự cài đặt 100% không dùng thư viện ngoài).
- * 
- * Sử dụng CustomThreadPool và CustomWorker tự lập trình để chứng minh khả năng
- * nắm bắt sâu sắc cơ chế luồng ở mức hệ điều hành và cấu trúc dữ liệu Producer-Consumer.
- */
 public class CustomThreadPoolServer extends BaseHttpServer {
 
     @Getter
