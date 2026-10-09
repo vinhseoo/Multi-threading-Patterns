@@ -145,17 +145,20 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            gap: 20px;
+            justify-content: flex-start;
+            gap: 16px;
             min-height: 0;
+            overflow: hidden;
         }
 
         /* BỐ CỤC LƯỚI & CỘT */
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 28px;
+            gap: 24px;
             align-items: stretch;
+            flex: 1;
+            min-height: 0;
             height: 100%;
         }
 
@@ -164,31 +167,40 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             align-items: stretch;
+            flex: 1;
+            min-height: 0;
+            height: 100%;
         }
 
         .grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
+            flex: 1;
+            min-height: 0;
         }
 
         .grid-5 {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 14px;
+            flex: 1;
+            min-height: 0;
         }
 
         /* CARDS GIAO DIỆN SÁNG CAO CẤP */
         .card {
             background: #FFFFFF;
             border: 1.5px solid var(--border-color);
-            border-radius: 14px;
-            padding: 24px;
+            border-radius: 16px;
+            padding: 24px 28px;
             box-shadow: var(--card-shadow);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             position: relative;
+            height: 100%;
+            min-height: 0;
         }
 
         .card.primary-accent {
@@ -218,25 +230,32 @@
 
         .card-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
+            font-size: 1.32rem;
+            font-weight: 800;
             color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 10px;
+            line-height: 1.3;
         }
 
         .card-body {
-            font-size: 0.98rem;
+            font-size: 1.05rem;
             color: var(--text-muted);
-            line-height: 1.6;
+            line-height: 1.7;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .card-body ul {
             padding-left: 20px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
+            flex: 1;
+            justify-content: space-around;
         }
 
         .card-body li strong {
@@ -247,14 +266,15 @@
         .callout {
             background: #F8FAFC;
             border-left: 5px solid var(--primary);
-            padding: 16px 20px;
-            border-radius: 0 10px 10px 0;
-            font-size: 1rem;
+            padding: 16px 22px;
+            border-radius: 0 12px 12px 0;
+            font-size: 1.02rem;
             color: #1E293B;
-            line-height: 1.55;
+            line-height: 1.6;
             display: flex;
             align-items: flex-start;
             gap: 12px;
+            margin-top: auto;
         }
 
         .callout.danger {
@@ -575,6 +595,289 @@
             font-weight: 800;
             color: var(--text-main);
             text-align: right;
+        }
+
+        /* BENTO DESIGN SYSTEM */
+        .bento-box {
+            background: #FFFFFF;
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px 24px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex: 1;
+            min-height: 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .bento-box.blue-theme {
+            border-top: 5px solid var(--primary);
+            background: linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 25%);
+        }
+
+        .bento-box.rose-theme {
+            border-top: 5px solid var(--accent-rose);
+            background: linear-gradient(180deg, #FFF5F6 0%, #FFFFFF 25%);
+        }
+
+        .bento-box.green-theme {
+            border-top: 5px solid var(--accent-green);
+            background: linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 25%);
+        }
+
+        .bento-box.amber-theme {
+            border-top: 5px solid var(--accent-amber);
+            background: linear-gradient(180deg, #FFFBEB 0%, #FFFFFF 25%);
+        }
+
+        .bento-box.purple-theme {
+            border-top: 5px solid var(--accent-purple);
+            background: linear-gradient(180deg, #FAF5FF 0%, #FFFFFF 25%);
+        }
+
+        .bento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #F1F5F9;
+            padding-bottom: 12px;
+        }
+
+        .bento-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bento-icon {
+            font-size: 1.8rem;
+        }
+
+        .bento-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .bento-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .bento-badge {
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .bento-badge.blue { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+        .bento-badge.rose { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
+        .bento-badge.green { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+        .bento-badge.amber { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+        .bento-badge.purple { background: #FAF5FF; color: #7C3AED; border: 1px solid #DDD6FE; }
+
+        .diagram-strip {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .strip-label {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .timeline-visual-modern {
+            display: flex;
+            height: 42px;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            text-align: center;
+        }
+
+        .time-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        .time-block.active {
+            background: #10B981;
+            padding: 0 14px;
+            font-size: 0.8rem;
+        }
+
+        .time-block.active span {
+            font-size: 0.68rem;
+            opacity: 0.9;
+        }
+
+        .time-block.wait {
+            background: repeating-linear-gradient(45deg, #F59E0B, #F59E0B 10px, #D97706 10px, #D97706 20px);
+            flex: 1;
+            font-size: 0.8rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .time-block.busy {
+            background: linear-gradient(90deg, #E11D48, #BE123C);
+            flex: 1;
+            font-size: 0.82rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .bento-subgrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .metric-callout-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .metric-badge-box {
+            background: #FFFFFF;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .metric-badge-box .m-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.55rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--primary);
+        }
+
+        .metric-badge-box.red .m-val { color: var(--accent-rose); }
+        .metric-badge-box.green .m-val { color: var(--accent-green); }
+        .metric-badge-box.amber .m-val { color: var(--accent-amber); }
+        .metric-badge-box.purple .m-val { color: var(--accent-purple); }
+
+        .metric-badge-box .m-lbl {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .sub-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .sub-card:hover {
+            background: #FFFFFF;
+            border-color: #CBD5E1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .sub-icon-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .sub-icon-badge.blue { background: #EFF6FF; color: #1D4ED8; }
+        .sub-icon-badge.rose { background: #FFF1F2; color: #E11D48; }
+        .sub-icon-badge.green { background: #ECFDF5; color: #059669; }
+        .sub-icon-badge.amber { background: #FFFBEB; color: #D97706; }
+        .sub-icon-badge.purple { background: #FAF5FF; color: #7C3AED; }
+
+        .sub-card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .sub-card-content strong {
+            font-size: 0.92rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .sub-card-content span {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .bento-footer-pill {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.86rem;
+            font-weight: 500;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .bento-footer-pill.blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+        .bento-footer-pill.rose { background: #FFF1F2; color: #9F1239; border: 1px solid #FECDD3; }
+        .bento-footer-pill.green { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+        .bento-footer-pill.amber { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+        .bento-footer-pill.purple { background: #FAF5FF; color: #5B21B6; border: 1px solid #DDD6FE; }
+
+        .takeaway-banner {
+            background: linear-gradient(90deg, #F8FAFC 0%, #EFF6FF 100%);
+            border: 1.5px solid #BFDBFE;
+            border-left: 6px solid var(--primary);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.95rem;
+            color: #1E293B;
+            line-height: 1.5;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            margin-top: auto;
+        }
+
+        .takeaway-icon {
+            font-size: 1.4rem;
         }
 
         /* ĐỒ HỌA TRỰC QUAN DIỄN GIẢI CƠ CHẾ */
@@ -1078,41 +1381,155 @@
 
             <div class="slide-content">
                 <div class="grid-2">
-                    <div class="card primary-accent">
-                        <div class="card-title">🌐 1. Tác Vụ I/O-Bound (Chiếm 80 — 90% Tải Mạng)</div>
-                        <div class="card-body">
-                            <strong>Đặc tính chu kỳ thời gian:</strong>
-                            <div class="timeline-visual">
-                                <div class="timeline-seg-active">Xử lý 2ms</div>
-                                <div class="timeline-seg-waiting">CHỜ ĐỢI GÓI TIN MẠNG / CSDL (100ms - CPU RẢNH)</div>
-                                <div class="timeline-seg-active">Gửi 2ms</div>
+                    <!-- BENTO BOX 1: I/O-BOUND -->
+                    <div class="bento-box blue-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🌐</span>
+                                <div>
+                                    <div class="bento-title">Tác Vụ I/O-Bound</div>
+                                    <div class="bento-subtitle">Đọc/Ghi Socket TCP, Database, Microservices</div>
+                                </div>
                             </div>
-                            <ul>
-                                <li><strong>Bản chất:</strong> Luồng máy chủ dành <strong>hơn 95% thời gian chỉ để chờ đợi</strong> dữ liệu mạng, nhưng bộ nhớ và tài nguyên vẫn bị chiếm dụng cứng.</li>
-                                <li><strong>Mục tiêu tối ưu:</strong> Tận dụng thời gian chờ để phục vụ các kết nối khác mà không tốn thêm tài nguyên phần cứng.</li>
-                            </ul>
+                            <span class="bento-badge blue">80% — 90% TẢI MẠNG</span>
                         </div>
-                        <div class="callout success">
-                            <strong>Trọng tâm đề tài:</strong> Sân khấu chính để Thread Pool và Virtual Threads giải phóng sức mạnh máy chủ.
+
+                        <!-- DIAGRAM STRIP -->
+                        <div class="diagram-strip">
+                            <div class="strip-label">CHUYỂN HÓA THỜI GIAN: 96% LÀ CHỜ ĐỢI (WAITING/BLOCKED)</div>
+                            <div class="timeline-visual-modern">
+                                <div class="time-block active">2ms<br><span>Đọc Socket</span></div>
+                                <div class="time-block wait">⏸️ 100ms CHỜ GÓI TIN MẠNG / CSDL (CPU RẢNH 0%)</div>
+                                <div class="time-block active">2ms<br><span>Gửi Data</span></div>
+                            </div>
+                        </div>
+
+                        <!-- METRIC CALLOUT -->
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box">
+                                <span class="m-val">~96%</span>
+                                <span class="m-lbl">Thời gian CPU rảnh rỗi chờ I/O mạng</span>
+                            </div>
+                            <div class="metric-badge-box">
+                                <span class="m-val">1 MB</span>
+                                <span class="m-lbl">RAM lãng phí / luồng OS bị Blocked</span>
+                            </div>
+                        </div>
+
+                        <!-- 4 SUB-CARDS (2x2 GRID) -->
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">💤</div>
+                                <div class="sub-card-content">
+                                    <strong>Lãng Phí Tài Nguyên</strong>
+                                    <span>CPU nhàn rỗi tuyệt đối nhưng bộ nhớ Stack 1MB vẫn bị giam giữ cứng ngắc.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">🧱</div>
+                                <div class="sub-card-content">
+                                    <strong>Nghẽn Kết Nối C10K</strong>
+                                    <span>Tạo 10,000 luồng tương đương ngốn 10GB RAM chỉ để đứng chờ mạng đến.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">🎯</div>
+                                <div class="sub-card-content">
+                                    <strong>Mục Tiêu Tối Ưu</strong>
+                                    <span>Tự động chuyển giao CPU ngay khi vào trạng thái chờ để phục vụ hàng ngàn kết nối.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">⚡</div>
+                                <div class="sub-card-content">
+                                    <strong>Giải Pháp Đề Tài</strong>
+                                    <span>Ứng dụng Worker Thread Pool và Java 21 Virtual Threads để giải phóng sức mạnh máy chủ.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ANCHORED TAKEAWAY -->
+                        <div class="bento-footer-pill blue">
+                            🚀 <strong>Sân khấu chính:</strong> Nơi Thread Pool & Virtual Threads giải phóng sức mạnh máy chủ
                         </div>
                     </div>
 
-                    <div class="card rose-accent">
-                        <div class="card-title">⚙️ 2. Tác Vụ CPU-Bound (Chiếm 10 — 20% Tải Mạng)</div>
-                        <div class="card-body">
-                            <strong>Đặc tính chu kỳ thời gian:</strong>
-                            <div class="timeline-visual">
-                                <div class="timeline-seg-busy">TÍNH TOÁN LIÊN TỤC 100% CÔNG SUẤT LÕI CPU (THUẬT TOÁN, NÉN, MÃ HÓA)</div>
+                    <!-- BENTO BOX 2: CPU-BOUND -->
+                    <div class="bento-box rose-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">⚙️</span>
+                                <div>
+                                    <div class="bento-title">Tác Vụ CPU-Bound</div>
+                                    <div class="bento-subtitle">Mã hóa SSL/TLS, Nén dữ liệu gzip, Thuật toán</div>
+                                </div>
                             </div>
-                            <ul>
-                                <li><strong>Bản chất:</strong> Chiếm dụng xung nhịp tính toán liên tục của CPU. Tốc độ xử lý bị <strong>chặn cứng bởi số lõi CPU vật lý</strong>.</li>
-                                <li><strong>Quy luật phần cứng:</strong> Càng ép tạo thêm nhiều luồng trên cùng số lõi, hệ thống càng chạy chậm do tranh chấp tài nguyên.</li>
-                            </ul>
+                            <span class="bento-badge rose">10% — 20% TẢI MẠNG</span>
                         </div>
-                        <div class="callout danger">
-                            <strong>Cảnh báo thiết kế:</strong> Không thể tăng tốc tác vụ CPU-Bound đơn thuần bằng cách tăng số lượng luồng!
+
+                        <!-- DIAGRAM STRIP -->
+                        <div class="diagram-strip">
+                            <div class="strip-label">CHUYỂN HÓA THỜI GIAN: 100% XUNG NHỊP LIÊN TỤC</div>
+                            <div class="timeline-visual-modern">
+                                <div class="time-block busy">🔥 TÍNH TOÁN LIÊN TỤC 100% CÔNG SUẤT LÕI CPU (KHÔNG NGHỈ)</div>
+                            </div>
+                        </div>
+
+                        <!-- METRIC CALLOUT -->
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box red">
+                                <span class="m-val">100%</span>
+                                <span class="m-lbl">Xung nhịp CPU hoạt động tối đa</span>
+                            </div>
+                            <div class="metric-badge-box red">
+                                <span class="m-val">N Lõi</span>
+                                <span class="m-lbl">Trần cứng giới hạn bởi số core vật lý</span>
+                            </div>
+                        </div>
+
+                        <!-- 4 SUB-CARDS (2x2 GRID) -->
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">🧱</div>
+                                <div class="sub-card-content">
+                                    <strong>Ranh Giới Phần Cứng</strong>
+                                    <span>Tốc độ xử lý phụ thuộc tuyệt đối vào số lõi CPU vật lý có sẵn trong máy chủ.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">⚠️</div>
+                                <div class="sub-card-content">
+                                    <strong>Nghịch Lý Tạo Luồng</strong>
+                                    <span>Càng tạo thêm nhiều luồng vượt quá số lõi, hệ thống càng chậm do tranh chấp.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">🔄</div>
+                                <div class="sub-card-content">
+                                    <strong>Phí Chuyển Ngữ Cảnh</strong>
+                                    <span>CPU mất hơn 70% công suất chỉ để dọn và tráo đổi bộ nhớ đệm Cache L1/L2.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">🛠️</div>
+                                <div class="sub-card-content">
+                                    <strong>Quy Tắc Thiết Kế</strong>
+                                    <span>Giới hạn số luồng tối đa bằng đúng số Core phần cứng để đạt hiệu suất cao nhất.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ANCHORED TAKEAWAY -->
+                        <div class="bento-footer-pill rose">
+                            🛡️ <strong>Cảnh báo thiết kế:</strong> Không thể tăng tốc CPU-Bound bằng cách đẻ thêm luồng
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH BOTTOM TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">💡</span>
+                    <div><strong>KẾT LUẬN KIẾN TRÚC:</strong> Hệ thống máy chủ mạng hiện đại phải tối ưu hóa triệt để cho tác vụ <strong>I/O-Bound (hơn 95% thời gian chờ mạng)</strong> thay vì tăng số lượng luồng vô tội vạ!</div>
                 </div>
             </div>
 
@@ -1153,27 +1570,103 @@
                 </div>
 
                 <div class="grid-2" style="margin-top: 8px;">
-                    <div class="card primary-accent">
-                        <div class="card-title">📦 Sự Lãng Phí Khi Bùng Nổ Kết Nối</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Ẩn dụ thực tế:</strong> Dùng xe tải 10 tấn chở 1 bức thư tay!</li>
-                                <li><strong>Hao phí bộ nhớ:</strong> 2,000 kết nối đồng thời = Tiêu hao ít nhất <strong>2GB RAM</strong> chỉ để cấp phòng làm việc riêng cho các luồng.</li>
-                                <li><strong>Thời gian khởi tạo:</strong> Mỗi lần sinh luồng mới đều phải xin phép nhân hệ điều hành, làm chậm tốc độ phản hồi.</li>
-                            </ul>
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box blue-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">📦</span>
+                                <div>
+                                    <div class="bento-title">Sự Lãng Phí Khi Bùng Nổ Kết Nối</div>
+                                    <div class="bento-subtitle">Chi phí bộ nhớ Stack và độ trễ khởi tạo cấp hệ điều hành</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge blue">1 MB / LUỒNG OS</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box">
+                                <span class="m-val">2.0 GB</span>
+                                <span class="m-lbl">RAM giam cầm cứng khi có 2,000 kết nối</span>
+                            </div>
+                            <div class="metric-badge-box">
+                                <span class="m-val">10 Tấn</span>
+                                <span class="m-lbl">Ẩn dụ: Xe tải 10 tấn chở 1 bức thư tay</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">🚚</div>
+                                <div class="sub-card-content">
+                                    <strong>Ẩn Dụ Thực Tế</strong>
+                                    <span>Cấp riêng cả phòng làm việc 1MB chỉ để xử lý vài chục bytes văn bản nhỏ.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">⏱️</div>
+                                <div class="sub-card-content">
+                                    <strong>Phí Khởi Tạo Kernel</strong>
+                                    <span>Mỗi lần sinh luồng mới phải qua System Call xin phép nhân OS, gây trễ mạng.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill blue">
+                            💡 <strong>Hậu quả:</strong> Bộ nhớ máy chủ cạn kiệt rất nhanh dù CPU hầu như không phải tính toán
                         </div>
                     </div>
 
-                    <div class="card rose-accent">
-                        <div class="card-title">💣 Nguy Cơ Chạm Trần & Sập Hệ Thống</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Hạn mức bảo vệ của máy tính:</strong> Hệ điều hành luôn giới hạn số luồng tối đa một ứng dụng được tạo ra.</li>
-                                <li><strong>Sập máy chủ tức thì:</strong> Khi vượt trần cho phép, hệ thống từ chối cấp phát, khiến ứng dụng sập ngay lập tức.</li>
-                                <li><strong>Kết luận:</strong> Không thể phục vụ hàng nghìn người dùng bằng cách đẻ luồng hệ điều hành vô hạn.</li>
-                            </ul>
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box rose-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">💣</span>
+                                <div>
+                                    <div class="bento-title">Nguy Cơ Chạm Trần & Sập Máy Chủ</div>
+                                    <div class="bento-subtitle">Giới hạn an toàn của hệ điều hành và thảm họa sập dịch vụ</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge rose">CRITICAL LIMIT</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box red">
+                                <span class="m-val">OOM</span>
+                                <span class="m-lbl">unable to create native thread</span>
+                            </div>
+                            <div class="metric-badge-box red">
+                                <span class="m-val">Kernel Max</span>
+                                <span class="m-lbl">Hạn mức luồng tối đa của hệ điều hành</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">🛑</div>
+                                <div class="sub-card-content">
+                                    <strong>Hạn Mức Bảo Vệ OS</strong>
+                                    <span>Hệ điều hành chặn không cho cấp thêm luồng để tránh treo toàn bộ máy tính.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">💥</div>
+                                <div class="sub-card-content">
+                                    <strong>Sập Hệ Thống Tức Thì</strong>
+                                    <span>Ứng dụng ném ngoại lệ dừng đột ngột, ngắt kết nối của toàn bộ người dùng đang online.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill rose">
+                            🛡️ <strong>Kết luận:</strong> Tuyệt đối không được phục vụ hàng ngàn client bằng cách đẻ luồng vô hạn
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">🏢</span>
+                    <div><strong>BÀI HỌC CỐT LÕI:</strong> Luồng hệ điều hành được thiết kế như những <strong>công nhân hạng nặng (Heavyweight)</strong>, hoàn toàn không phù hợp để ánh xạ trực tiếp 1-1 với các kết nối mạng siêu nhẹ!</div>
                 </div>
             </div>
 
@@ -1218,22 +1711,103 @@
                 </div>
 
                 <div class="grid-2" style="margin-top: 8px;">
-                    <div class="card rose-accent">
-                        <div class="card-title">📉 Nghẽn Bão Hòa Hiệu Năng</div>
-                        <div class="card-body">
-                            • Khi có hàng trăm luồng cùng tranh chấp một số ít lõi CPU, hệ điều hành liên tục tráo đổi luồng qua lại.<br>
-                            • Chỉ số CPU trên màn hình vọt lên <strong>90% — 100%</strong> nhưng công việc thực tế đứng im.<br>
-                            • Hơn 70% công suất máy tính bị lãng phí chỉ để phục vụ cho việc hoán đổi công nhân.
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box rose-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">📉</span>
+                                <div>
+                                    <div class="bento-title">Nghẽn Bão Hòa Hiệu Năng</div>
+                                    <div class="bento-subtitle">Hiện tượng Thrashing khi CPU chỉ lo đổi công nhân</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge rose">> 70% CPU LÃNG PHÍ</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box red">
+                                <span class="m-val">100%</span>
+                                <span class="m-lbl">Chỉ số CPU vọt đỉnh do tranh chấp</span>
+                            </div>
+                            <div class="metric-badge-box red">
+                                <span class="m-val">0 RPS</span>
+                                <span class="m-lbl">Tiến độ công việc thực tế bị đóng băng</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">⚡</div>
+                                <div class="sub-card-content">
+                                    <strong>Xóa Trúng Cache L1/L2</strong>
+                                    <span>Bộ nhớ đệm siêu tốc bị hủy sạch mỗi lần tráo đổi luồng làm mất dữ liệu gần.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">🐢</div>
+                                <div class="sub-card-content">
+                                    <strong>Nạp Lại Từ RAM Chậm Chạp</strong>
+                                    <span>CPU phải chờ đợi hàng trăm chu kỳ xung nhịp để kéo ngữ cảnh luồng mới vào lõi.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill rose">
+                            ⚠️ <strong>Bi kịch:</strong> Máy chủ gào rú 100% CPU nhưng người dùng lại bị treo màn hình!
                         </div>
                     </div>
 
-                    <div class="card amber-accent">
-                        <div class="card-title">🎯 Bài Học Thiết Kế Kiến Trúc</div>
-                        <div class="card-body">
-                            • <strong>Nguyên tắc vàng:</strong> Cần giữ số lượng luồng hệ điều hành chạy đồng thời ở mức tương đương với số lõi CPU vật lý.<br>
-                            • Cần các mô hình thông minh hơn: <strong>Hàng đợi kiểm soát (Thread Pool)</strong> hoặc <strong>Luồng ảo siêu nhẹ (Virtual Threads)</strong>.
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box amber-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🎯</span>
+                                <div>
+                                    <div class="bento-title">Quy Tắc Vàng Thiết Kế Hệ Thống</div>
+                                    <div class="bento-subtitle">Chiến lược kiểm soát luồng giải cứu máy chủ mạng</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge amber">KIẾN TRÚC TỐI ƯU</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box amber">
+                                <span class="m-val">Threads ≈ Cores</span>
+                                <span class="m-lbl">Nguyên tắc số luồng tương đương lõi CPU</span>
+                            </div>
+                            <div class="metric-badge-box amber">
+                                <span class="m-val">2 Giải Pháp</span>
+                                <span class="m-lbl">Thread Pool & Virtual Threads</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge amber">🏢</div>
+                                <div class="sub-card-content">
+                                    <strong>Hồ Luồng Kiểm Soát (Pool)</strong>
+                                    <span>Cố định số lượng công nhân và cho tác vụ xếp hàng đợi ngăn chặn nghẽn CPU.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge amber">🍃</div>
+                                <div class="sub-card-content">
+                                    <strong>Luồng Ảo Java 21</strong>
+                                    <span>Chuyển quyền điều phối luồng từ Kernel OS về máy ảo JVM để triệt tiêu chi phí.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill amber">
+                            🚀 <strong>Mục tiêu:</strong> Tối đa hóa công suất CPU mà không phải trả phí chuyển ngữ cảnh của OS
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">🎯</span>
+                    <div><strong>BẢN CHẤT KỸ THUẬT:</strong> Đừng bao giờ nhầm lẫn giữa <strong>"nhiều luồng"</strong> và <strong>"chạy nhanh"</strong>. Số luồng vượt quá năng lực phần cứng chỉ tạo ra vòng xoáy lãng phí năng lượng vô ích!</div>
                 </div>
             </div>
 
@@ -1353,26 +1927,103 @@
                 </div>
 
                 <div class="grid-2">
-                    <div class="card rose-accent">
-                        <div class="card-title">🛑 Hiện Tượng Kẹt Xe Dây Chuyền (Head-of-Line Blocking)</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>👥 Khách bị giam ngoài hành lang:</strong> Khi khách thứ 1 đang phục vụ, 29 khách còn lại bị giam lỏng hoàn toàn trong hàng đợi mạng của Hệ điều hành (TCP Backlog), chưa hề được bước chân vào máy chủ.</li>
-                                <li><strong>📉 Hiệu năng sụp đổ:</strong> 30 yêu cầu trễ 100ms sẽ mất tới <strong>3,000 mili-giây (3 giây)</strong> vì phải nối đuôi nhau lần lượt.</li>
-                                <li><strong>Thông lượng mạng:</strong> Rơi xuống đáy, chỉ đạt <strong>~9.8 yêu cầu/giây</strong>.</li>
-                            </ul>
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box rose-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🛑</span>
+                                <div>
+                                    <div class="bento-title">Kẹt Xe Dây Chuyền (Head-of-Line Blocking)</div>
+                                    <div class="bento-subtitle">Hiện tượng một kết nối chặn toàn bộ hệ thống</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge rose">NGHẼN CỔ CHAI</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box red">
+                                <span class="m-val">9.8 RPS</span>
+                                <span class="m-lbl">Thông lượng rơi xuống đáy do phục vụ lần lượt</span>
+                            </div>
+                            <div class="metric-badge-box red">
+                                <span class="m-val">3,000 ms</span>
+                                <span class="m-lbl">Tổng độ trễ tích lũy khi có 30 kết nối nối đuôi</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">🚪</div>
+                                <div class="sub-card-content">
+                                    <strong>Giam Cầm TCP Backlog</strong>
+                                    <span>Khách 1 đang phục vụ, 29 khách còn lại bị giam ngoài hàng đợi mạng của OS.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">💤</div>
+                                <div class="sub-card-content">
+                                    <strong>Lãng Phí 99% Năng Lực</strong>
+                                    <span>1 luồng bị treo chờ I/O mạng 100ms, toàn bộ máy tính bị kéo tụt theo.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill rose">
+                            ⚠️ <strong>Hạn chế:</strong> Chỉ cần 1 khách mạng chậm (Slowloris), toàn bộ máy chủ tê liệt!
                         </div>
                     </div>
 
-                    <div class="card primary-accent">
-                        <div class="card-title">💡 Ý Nghĩa Khoa Học Trong Đề Tài</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Mốc đối chứng cơ bản:</strong> Làm chuẩn để đo lường mức độ cải thiện của 4 mô hình đa luồng phía sau.</li>
-                                <li><strong>Đặc tính tiêu hao:</strong> Chỉ dùng đúng 1 luồng hệ điều hành duy nhất, chi phí CPU và RAM cực thấp nhưng trải nghiệm người dùng hoàn toàn sụp đổ khi có nhiều kết nối.</li>
-                            </ul>
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box blue-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">💡</span>
+                                <div>
+                                    <div class="bento-title">Ý Nghĩa Khoa Học Trong Đề Tài</div>
+                                    <div class="bento-subtitle">Mốc đối chứng cơ bản và tư duy thiết kế đơn luồng</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge blue">BASELINE CHUẨN</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box">
+                                <span class="m-val">1 Thread</span>
+                                <span class="m-lbl">Chỉ dùng duy nhất 1 luồng OS xuyên suốt</span>
+                            </div>
+                            <div class="metric-badge-box">
+                                <span class="m-val">0 Lock</span>
+                                <span class="m-lbl">Không lo tranh chấp bộ nhớ hay Deadlock</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">📏</div>
+                                <div class="sub-card-content">
+                                    <strong>Thước Đo Chuẩn Mực</strong>
+                                    <span>Làm mốc đối chứng khoa học để đo lường mức bứt phá của 4 mô hình đa luồng.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">📉</div>
+                                <div class="sub-card-content">
+                                    <strong>Đánh Đổi Trải Nghiệm</strong>
+                                    <span>Chi phí CPU và RAM cực thấp nhưng không thể đáp ứng môi trường mạng hiện đại.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill blue">
+                            🎯 <strong>Đúc kết:</strong> Đơn luồng chỉ thích hợp cho script cục bộ, tối kỵ cho server đồng thời
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">💡</span>
+                    <div><strong>BÀI HỌC THIẾT KẾ:</strong> Mô hình tuần tự thất bại không phải vì thiếu CPU, mà vì <strong>thời gian chờ I/O mạng của người trước</strong> biến thành <strong>thời gian chờ đợi của người sau</strong>!</div>
                 </div>
             </div>
 
@@ -1417,25 +2068,103 @@
                 </div>
 
                 <div class="grid-2">
-                    <div class="card green-accent">
-                        <div class="card-title">⚡ Lợi Thế Song Song Ban Đầu</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Phục vụ đồng thời:</strong> 30 kết nối được 30 luồng phục vụ song song cùng lúc.</li>
-                                <li><strong>Tốc độ tức thì ở tải thấp:</strong> 30 yêu cầu hoàn tất đồng loạt trong chỉ <strong>115 mili-giây</strong> (nhanh gấp 26 lần Mode 1), thông lượng đạt ~285 req/s.</li>
-                            </ul>
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box green-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">⚡</span>
+                                <div>
+                                    <div class="bento-title">Lợi Thế Song Song Tức Thì</div>
+                                    <div class="bento-subtitle">Tăng tốc vượt trội ở mức tải đồng thời nhỏ</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge green">TĂNG TỐC 26x</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box green">
+                                <span class="m-val">285 RPS</span>
+                                <span class="m-lbl">Thông lượng bứt phá gấp 26 lần so với Mode 1</span>
+                            </div>
+                            <div class="metric-badge-box green">
+                                <span class="m-val">115 ms</span>
+                                <span class="m-lbl">30 kết nối hoàn tất song song đồng thời</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">🚀</div>
+                                <div class="sub-card-content">
+                                    <strong>Độc Lập Tuyệt Đối</strong>
+                                    <span>Mỗi khách có 1 công nhân riêng phục vụ, không ai phải đợi ai.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">✨</div>
+                                <div class="sub-card-content">
+                                    <strong>Cảm Giác Tức Thì</strong>
+                                    <span>Ở quy mô vài chục khách, phản hồi cực kỳ mượt mà và dễ hiểu.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill green">
+                            ✨ <strong>Ưu điểm:</strong> Lập trình trực quan, giải quyết triệt để vấn đề Head-of-Line Blocking
                         </div>
                     </div>
 
-                    <div class="card rose-accent">
-                        <div class="card-title">💣 Cái Bẫy Bùng Nổ Khi Tải Cao</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Đường đỏ bám sát đường xanh:</strong> Trên biểu đồ giám sát, số luồng hệ điều hành tăng dựng đứng theo số kết nối.</li>
-                                <li><strong>Quá tải bộ nhớ:</strong> 2,000 kết nối đòi 2,000 MB RAM chỉ để giữ luồng. Hệ thống cạn kiệt bộ nhớ và lập tức sập máy chủ.</li>
-                            </ul>
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box rose-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">💣</span>
+                                <div>
+                                    <div class="bento-title">Cái Bẫy Bùng Nổ Khi Tải Cao</div>
+                                    <div class="bento-subtitle">Giới hạn phần cứng và nguy cơ sập máy chủ</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge rose">CRITICAL RISK</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box red">
+                                <span class="m-val">OOM Crash</span>
+                                <span class="m-lbl">Sập ứng dụng khi vượt ngưỡng luồng OS cho phép</span>
+                            </div>
+                            <div class="metric-badge-box red">
+                                <span class="m-val">2,000 MB</span>
+                                <span class="m-lbl">Bộ nhớ RAM giam cứng vô ích khi tải tăng</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">📈</div>
+                                <div class="sub-card-content">
+                                    <strong>Đường Đỏ Bám Sát Xanh</strong>
+                                    <span>Số luồng OS tăng vọt dựng đứng tỉ lệ 1:1 theo lượng khách truy cập.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">💥</div>
+                                <div class="sub-card-content">
+                                    <strong>Kiệt Quệ Hệ Thống</strong>
+                                    <span>Hàng nghìn luồng tranh chấp lõi CPU khiến máy chủ quá tải và tự tắt.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill rose">
+                            🛡️ <strong>Cảnh báo:</strong> Mô hình ngây thơ (Naive Pattern), không thể chạy production!
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">⚠️</span>
+                    <div><strong>KẾT LUẬN THIẾT KẾ:</strong> Mode 2 đánh đổi sự an toàn của cả hệ điều hành để đổi lấy sự tiện lợi nhất thời. Hệ thống sẽ <strong>sụp đổ ngay khi có đợt traffic spike</strong>!</div>
                 </div>
             </div>
 
@@ -1480,25 +2209,103 @@
                 </div>
 
                 <div class="grid-2">
-                    <div class="card primary-accent">
-                        <div class="card-title">🔒 Khóa Cứng Hạn Mức Tài Nguyên</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Bảo vệ 100%:</strong> Dù bên ngoài có 500 hay 1,000 khách tràn vào, số luồng hệ điều hành <strong>luôn bị chặn cứng ở mức 16 luồng</strong>, không bao giờ phát sinh thêm.</li>
-                                <li><strong>Tránh lãng phí:</strong> CPU không bị quá tải do chuyển đổi luồng, duy trì thông lượng ổn định ~150 yêu cầu/giây.</li>
-                            </ul>
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box blue-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🔒</span>
+                                <div>
+                                    <div class="bento-title">Khóa Cứng Hạn Mức Tài Nguyên</div>
+                                    <div class="bento-subtitle">Chiến lược kiểm soát tuyệt đối công nhân hệ điều hành</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge blue">CHUẨN DOANH NGHIỆP</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box">
+                                <span class="m-val">16 Luồng</span>
+                                <span class="m-lbl">Chặn cứng số công nhân, không bao giờ sinh thêm</span>
+                            </div>
+                            <div class="metric-badge-box">
+                                <span class="m-val">~150 RPS</span>
+                                <span class="m-lbl">Thông lượng ổn định bền vững theo thời gian</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">🛡️</div>
+                                <div class="sub-card-content">
+                                    <strong>Tái Sử Dụng Luồng</strong>
+                                    <span>Công nhân làm xong việc không bị hủy mà quay lại nhận việc mới lập tức.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">⚡</div>
+                                <div class="sub-card-content">
+                                    <strong>Không Quá Tải CPU</strong>
+                                    <span>Triệt tiêu hoàn toàn chi phí tạo luồng mới và bảo vệ lõi xử lý khỏi nghẽn.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill blue">
+                            ✨ <strong>Ưu điểm:</strong> Mẫu thiết kế phòng ngự kinh điển của các hệ thống backend lớn
                         </div>
                     </div>
 
-                    <div class="card green-accent">
-                        <div class="card-title">⚖️ Đánh Đổi Thiết Kế</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Khi tải vượt quá 16 người:</strong> Các yêu cầu đến sau phải ngồi chờ trong hàng ghế chờ, phát sinh độ trễ xếp hàng (Queuing Delay).</li>
-                                <li><strong>Đánh giá:</strong> Đây là sự đánh đổi chấp nhận được để giữ vững sự sống còn của máy chủ doanh nghiệp.</li>
-                            </ul>
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box amber-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">⚖️</span>
+                                <div>
+                                    <div class="bento-title">Sự Đánh Đổi Thiết Kế (Trade-off)</div>
+                                    <div class="bento-subtitle">Độ trễ hàng đợi và sự sống còn của máy chủ</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge amber">QUEUING DELAY</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box amber">
+                                <span class="m-val">1,000 Chỗ</span>
+                                <span class="m-lbl">Dung lượng hàng ghế chờ đệm an toàn</span>
+                            </div>
+                            <div class="metric-badge-box amber">
+                                <span class="m-val">+ Latency</span>
+                                <span class="m-lbl">Độ trễ tăng nhẹ khi khách vượt số luồng</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge amber">⏳</div>
+                                <div class="sub-card-content">
+                                    <strong>Chờ Đến Lượt</strong>
+                                    <span>Khách thứ 17 trở đi phải ngồi chờ trong hàng ghế, phát sinh độ trễ xếp hàng.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge amber">🎯</div>
+                                <div class="sub-card-content">
+                                    <strong>Đánh Đổi Xứng Đáng</strong>
+                                    <span>Thà để khách đợi thêm vài chục mili-giây còn hơn để sập máy chủ toàn diện.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill amber">
+                            💡 <strong>Cốt lõi:</strong> Duy trì tính toàn vẹn và sự sẵn sàng liên tục của dịch vụ
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">🏢</span>
+                    <div><strong>BÀI HỌC VẬN HÀNH:</strong> Thread Pool là <strong>lá chắn phòng thủ số 1</strong> của mọi kiến trúc máy chủ mạng. Nó tách rời số lượng khách kết nối ra khỏi số lượng luồng vật lý!</div>
                 </div>
             </div>
 
@@ -1537,21 +2344,103 @@
                 </div>
 
                 <div class="grid-2">
-                    <div class="card rose-accent">
-                        <div class="card-title">⚠️ Nguy Cơ Của Hàng Chờ Vô Hạn</div>
-                        <div class="card-body">
-                            • Nếu cho phép xếp hàng vô tận không giới hạn, khi tải đột biến ùa vào, hàng đợi sẽ phình to nuốt trọn bộ nhớ RAM.<br>
-                            • Hậu quả: <strong>Sập hoàn toàn máy chủ</strong>, khiến toàn bộ người dùng đều mất kết nối.
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box rose-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">⚠️</span>
+                                <div>
+                                    <div class="bento-title">Hiểm Họa Của Hàng Đợi Vô Hạn</div>
+                                    <div class="bento-subtitle">Cái bẫy Unbounded Queue nuốt trọn bộ nhớ RAM</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge rose">UNBOUNDED QUEUE</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box red">
+                                <span class="m-val">RAM Cạn</span>
+                                <span class="m-lbl">Hàng đợi phình to không đáy nuốt trọn bộ nhớ</span>
+                            </div>
+                            <div class="metric-badge-box red">
+                                <span class="m-val">Treo Máy</span>
+                                <span class="m-lbl">Khách đợi hàng chục giây nhưng không được xử lý</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">💣</div>
+                                <div class="sub-card-content">
+                                    <strong>Sóng Tải Spike Bùng Nổ</strong>
+                                    <span>Khi hàng chục ngàn yêu cầu ập vào, bộ nhớ Heap bị quá tải dẫn đến tràn RAM.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">💥</div>
+                                <div class="sub-card-content">
+                                    <strong>Sập Kéo Theo Toàn Bộ</strong>
+                                    <span>Máy chủ sập khiến mọi khách hàng đang được phục vụ đều mất kết nối đột ngột.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill rose">
+                            🛑 <strong>Sai lầm lớn:</strong> Sử dụng hàng đợi không giới hạn (Unbounded) trong sản phẩm thực tế
                         </div>
                     </div>
 
-                    <div class="card green-accent">
-                        <div class="card-title">🛡️ Triết Lý Thiết Kế Thực Tế</div>
-                        <div class="card-body">
-                            • Thay vì cố nhận thêm để rồi bị sập máy chủ, hệ thống từ chối an toàn và nhắn hẹn khách thử lại sau 2 giây.<br>
-                            • <strong>Ý nghĩa:</strong> Hy sinh từ chối yêu cầu vượt ngưỡng để <strong>bảo vệ 100% sự ổn định</strong> cho các yêu cầu đang được phục vụ.
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box green-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🛡️</span>
+                                <div>
+                                    <div class="bento-title">Van Xả Áp Chủ Động (Fail-Fast)</div>
+                                    <div class="bento-subtitle">Cơ chế từ chối nhanh cứu sống máy chủ</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge green">HTTP 503 SERVICE UNAVAILABLE</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box green">
+                                <span class="m-val">0 ms Trễ</span>
+                                <span class="m-lbl">Từ chối dứt khoát ngay lập tức khi ghế chờ đầy</span>
+                            </div>
+                            <div class="metric-badge-box green">
+                                <span class="m-val">100% Sống</span>
+                                <span class="m-lbl">Bảo vệ an toàn tuyệt đối các khách đang phục vụ</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">⚡</div>
+                                <div class="sub-card-content">
+                                    <strong>Từ Chối Lịch Sự (Fail-Fast)</strong>
+                                    <span>Trả về mã HTTP 503 cùng hẹn thử lại sau 2s, giúp client biết đường xoay xở.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">🏰</div>
+                                <div class="sub-card-content">
+                                    <strong>Pháo Đài Phòng Thủ</strong>
+                                    <span>Hy sinh từ chối yêu cầu vượt ngưỡng để giữ cho máy chủ luôn duy trì nhịp thở.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill green">
+                            🚀 <strong>Giá trị kỹ thuật:</strong> Triệt tiêu nguy cơ sập máy chủ trước các cuộc tấn công đột biến
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">🛡️</span>
+                    <div><strong>TRIẾT LÝ BACKPRESSURE:</strong> Từ chối nhanh <strong>(Fail-Fast)</strong> một số yêu cầu văn minh hơn nhiều so với việc nhận bừa để rồi <strong>sập toàn bộ hệ thống</strong>!</div>
                 </div>
             </div>
 
@@ -1587,35 +2476,104 @@
                     <div style="font-size: 0.82rem; color: #6D28D9; font-weight: 600; margin-left: 12px;">Đầu nạp việc xoay vòng liên tục khép kín, không bao giờ phải dịch chuyển mảng!</div>
                 </div>
 
-                <div class="grid-3">
-                    <div class="card purple-accent">
-                        <div class="card-title">🍣 1. Băng Chuyền O(1)</div>
-                        <div class="card-body">
-                            • Tự thiết kế hàng đợi như băng chuyền sushi hình tròn khép kín.<br>
-                            • Đặt việc vào ở một đầu và lấy việc ra ở đầu đối diện một cách liên tục.<br>
-                            • Đạt tốc độ xử lý tức thì với độ phức tạp tối ưu O(1).
+                <div class="grid-2">
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box purple-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🍣</span>
+                                <div>
+                                    <div class="bento-title">Băng Chuyền Vòng Khép Kín O(1)</div>
+                                    <div class="bento-subtitle">Thuật toán mảng vòng tối ưu bộ nhớ không dùng thư viện ngoài</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge purple">CIRCULAR RING BUFFER</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box purple">
+                                <span class="m-val">O(1) Tốc Độ</span>
+                                <span class="m-lbl">Độ phức tạp thêm việc và rút việc tức thì</span>
+                            </div>
+                            <div class="metric-badge-box purple">
+                                <span class="m-val">Zero Shift</span>
+                                <span class="m-lbl">Không bao giờ phải sao chép hay dịch chuyển mảng</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge purple">🔄</div>
+                                <div class="sub-card-content">
+                                    <strong>Cấu Trúc Sushi Vòng Tròn</strong>
+                                    <span>Đầu nạp việc (Head) và đầu rút việc (Tail) xoay vòng khép kín liên tục.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge purple">🔒</div>
+                                <div class="sub-card-content">
+                                    <strong>Đồng Bộ Hóa Đa Luồng</strong>
+                                    <span>Tự xây dựng cơ chế khóa an toàn ngăn chặn tranh chấp dữ liệu giữa các công nhân.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill purple">
+                            ✨ <strong>Tự chủ công nghệ:</strong> Tự lập trình 100% cấu trúc dữ liệu cốt lõi từ đầu
                         </div>
                     </div>
 
-                    <div class="card purple-accent">
-                        <div class="card-title">⏰ 2. Thức Giấc & Ngủ Đông</div>
-                        <div class="card-body">
-                            • <strong>Khi có việc mới:</strong> Phát tín hiệu đánh thức công nhân đang nghỉ dậy làm việc.<br>
-                            • <strong>Khi hết việc:</strong> Công nhân tự động đi ngủ đông để trả lại 100% năng lực CPU cho máy tính.
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box purple-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">⏰</span>
+                                <div>
+                                    <div class="bento-title">Ngủ Đông & Tắt Máy An Toàn</div>
+                                    <div class="bento-subtitle">Tối ưu năng lượng CPU và cơ chế dọn dẹp chuẩn mực</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge purple">GRACEFUL SHUTDOWN</span>
                         </div>
-                    </div>
 
-                    <div class="card purple-accent">
-                        <div class="card-title">🛡️ 3. Dừng Máy Chủ An Toàn</div>
-                        <div class="card-body">
-                            • Quản lý danh sách 16 công nhân làm việc song song.<br>
-                            • Đợi các công việc đang dang dở trên băng chuyền làm xong hoàn toàn mới cho nhân viên nghỉ, không làm mất mát dữ liệu khách hàng.
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box purple">
+                                <span class="m-val">0% CPU Rảnh</span>
+                                <span class="m-lbl">Luồng tự động ngủ đông khi hàng đợi trống</span>
+                            </div>
+                            <div class="metric-badge-box purple">
+                                <span class="m-val">Zero Data Loss</span>
+                                <span class="m-lbl">Dừng máy chủ không rơi rớt bất kỳ yêu cầu nào</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge purple">💤</div>
+                                <div class="sub-card-content">
+                                    <strong>Đánh Thức & Ngủ Đông</strong>
+                                    <span>Có việc phát tín hiệu gọi dậy, hết việc tự động ngủ để trả lại 100% CPU.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge purple">🛡️</div>
+                                <div class="sub-card-content">
+                                    <strong>Đóng Cửa Chuẩn Mực</strong>
+                                    <span>Đợi toàn bộ công việc dang dở làm xong hoàn toàn mới giải phóng tài nguyên.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill purple">
+                            🎓 <strong>Bảo vệ đồ án:</strong> Minh chứng khả năng làm chủ giải thuật đa luồng tầng thấp trước hội đồng
                         </div>
                     </div>
                 </div>
 
-                <div class="callout" style="border-left-color: var(--accent-purple); background: var(--accent-purple-light); color: #581C87;">
-                    <strong>Giá trị bảo vệ đồ án:</strong> Chứng minh năng lực làm chủ trọn vẹn cấu trúc dữ liệu và giải thuật đa luồng tầng thấp, tự tin thuyết phục hội đồng chấm thi bằng sản phẩm tự tay lập trình 100%.
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner" style="border-left-color: var(--accent-purple); border-color: #DDD6FE;">
+                    <span class="takeaway-icon">⚙️</span>
+                    <div><strong>ĐIỂM SÁNG 30%:</strong> Việc tự cài đặt thành công Thread Pool chứng minh sinh viên hiểu sâu sắc <strong>cơ chế điều phối luồng ở tầng gốc rễ</strong> chứ không chỉ biết gọi thư viện có sẵn!</div>
                 </div>
             </div>
 
@@ -1657,27 +2615,103 @@
                 </div>
 
                 <div class="grid-2">
-                    <div class="card green-accent">
-                        <div class="card-title">🔄 Chu Trình Gắn & Nhường (Mount / Unmount)</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>1. Gắn vào làm việc:</strong> Luồng ảo được gắn lên một lõi xử lý vật lý để chạy tính toán.</li>
-                                <li><strong>2. Nhường bàn khi chờ đợi:</strong> Khi gặp thao tác phải chờ (đọc mạng, truy vấn CSDL), hệ thống tự nhấc luồng này ra cất vào bộ nhớ và nhường ngay lõi cho người khác vào làm.</li>
-                                <li><strong>3. Quay lại tức thì:</strong> Khi mạng có dữ liệu, luồng ảo được đặt lại lên một lõi rảnh để chạy tiếp!</li>
-                            </ul>
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box green-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🍃</span>
+                                <div>
+                                    <div class="bento-title">Cách Mạng Luồng Ảo Siêu Nhẹ</div>
+                                    <div class="bento-subtitle">Đột phá kiến trúc Java 21 Project Loom</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge green">TIẾT KIỆM BỘ NHỚ x1000</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box green">
+                                <span class="m-val">~1 KB / Luồng</span>
+                                <span class="m-lbl">Nhẹ gấp 1,000 lần so với 1MB của luồng OS</span>
+                            </div>
+                            <div class="metric-badge-box green">
+                                <span class="m-val">1,000,000+</span>
+                                <span class="m-lbl">Khởi tạo hàng triệu luồng ảo thoải mái trên Heap</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">🏢</div>
+                                <div class="sub-card-content">
+                                    <strong>Điều Phối Tầng JVM</strong>
+                                    <span>Máy ảo Java tự quản lý luồng trong User-Space, không phụ thuộc Kernel OS.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">⚡</div>
+                                <div class="sub-card-content">
+                                    <strong>Khởi Tạo Tức Thì</strong>
+                                    <span>Sinh 10,000 luồng ảo nhẹ và nhanh tương đương tạo 10,000 đối tượng Java thông thường.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill green">
+                            🚀 <strong>Bứt phá:</strong> Xóa bỏ hoàn toàn rào cản chi phí bộ nhớ của mô hình Thread-Per-Connection cũ
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-title">🌟 Sức Mạnh Kỷ Lục Thực Tế</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Trọng lượng siêu nhẹ:</strong> Mỗi luồng ảo chỉ tốn vài trăm Bytes (nhỏ hơn hàng nghìn lần so với 1MB của luồng OS). Tạo hàng trăm nghìn luồng không lo tràn RAM.</li>
-                                <li><strong>Thông lượng bứt phá:</strong> Đạt thông lượng kỷ lục <strong>~1,145+ yêu cầu/giây</strong> với độ trễ siêu thấp dưới 75ms.</li>
-                                <li><strong>Đơn giản:</strong> Giữ nguyên cách viết tuần tự tự nhiên nhưng đạt tốc độ tối đa.</li>
-                            </ul>
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box green-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🔄</span>
+                                <div>
+                                    <div class="bento-title">Cơ Chế Gắn/Nhả (Mount / Unmount)</div>
+                                    <div class="bento-subtitle">Tối ưu hóa thời gian chờ mạng đến mức tối đa</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge green">VÔ ĐỊCH THÔNG LƯỢNG</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box green">
+                                <span class="m-val">724+ RPS</span>
+                                <span class="m-lbl">Thông lượng kỷ lục cao nhất toàn bộ đề tài</span>
+                            </div>
+                            <div class="metric-badge-box green">
+                                <span class="m-val">&lt; 75 ms</span>
+                                <span class="m-lbl">Độ trễ trung bình cực thấp và đồng đều</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">⏸️</div>
+                                <div class="sub-card-content">
+                                    <strong>Nhả Lõi Khi Chờ I/O (Unmount)</strong>
+                                    <span>Gặp lệnh chờ mạng 100ms, luồng ảo tự rời bàn và cất trạng thái vào Heap.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">▶️</div>
+                                <div class="sub-card-content">
+                                    <strong>Tiếp Tục Lắp Luồng Mới</strong>
+                                    <span>Lõi CPU vật lý ngay lập tức phục vụ kết nối khác mà không bao giờ phải ngồi chơi.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill green">
+                            👑 <strong>Ngôi vương:</strong> Giữ trọn cách viết code đồng bộ đơn giản nhưng đạt hiệu năng phi đồng bộ
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner" style="border-left-color: var(--accent-green); border-color: #A7F3D0;">
+                    <span class="takeaway-icon">🚀</span>
+                    <div><strong>TƯƠNG LAI CÔNG NGHỆ:</strong> Virtual Threads chính thức xóa bỏ cuộc giằng co kéo dài 20 năm giữa <strong>"Code dễ đọc (Blocking)"</strong> và <strong>"Hiệu năng cao (Non-blocking/Reactive)"</strong>!</div>
                 </div>
             </div>
 
@@ -1793,27 +2827,103 @@
                 </div>
 
                 <div class="grid-2">
-                    <div class="card primary-accent">
-                        <div class="card-title">🛣️ Nguyên Lý Trạm Thu Phí Nhiều Làn (Lock-Free)</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Vấn đề tắc nghẽn khi đo:</strong> Nếu phải dừng luồng lại để đếm số, chính công cụ đo sẽ bóp nghẹt hiệu năng của hệ thống.</li>
-                                <li><strong>Giải pháp chia làn:</strong> Mở sẵn nhiều ô nhớ độc lập cho các luồng tự ghi nhận dữ liệu song song mà không cần dừng lại chờ nhau.</li>
-                                <li><strong>Giám sát phần cứng:</strong> Trích xuất trực tiếp số lượng luồng thực tế của hệ điều hành, mức độ ngốn CPU và RAM của máy tính.</li>
-                            </ul>
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box blue-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🛣️</span>
+                                <div>
+                                    <div class="bento-title">Đo Lường Không Khóa (Lock-Free)</div>
+                                    <div class="bento-subtitle">Nguyên lý trạm thu phí nhiều làn với Atomic LongAdder</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge blue">ZERO OVERHEAD</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box">
+                                <span class="m-val">0 Lock</span>
+                                <span class="m-lbl">Không dùng lệnh khóa chặn (Lock-Free CAS)</span>
+                            </div>
+                            <div class="metric-badge-box">
+                                <span class="m-val">0.0% Trễ</span>
+                                <span class="m-lbl">Đo đạc số liệu không làm chậm luồng xử lý mạng</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">🛣️</div>
+                                <div class="sub-card-content">
+                                    <strong>Trạm Thu Phí Nhiều Làn</strong>
+                                    <span>Mỗi luồng ghi số liệu vào ô nhớ riêng biệt, tránh hoàn toàn tranh chấp biến chung.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">💻</div>
+                                <div class="sub-card-content">
+                                    <strong>Đo Trực Tiếp Từ OS Kernel</strong>
+                                    <span>Trích xuất số lượng luồng thực tế của hệ điều hành, RAM vật lý và xung nhịp CPU.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill blue">
+                            ✨ <strong>Chính xác:</strong> Số liệu đo lường trung thực tuyệt đối mà không bóp méo hiệu năng
                         </div>
                     </div>
 
-                    <div class="card green-accent">
-                        <div class="card-title">🖥️ Web Dashboard Canvas Thời Gian Thực</div>
-                        <div class="card-body">
-                            <ul>
-                                <li><strong>Đồ họa mượt mà:</strong> Vẽ trực tiếp bằng động cơ Canvas với tần số quét 60 khung hình/giây.</li>
-                                <li><strong>Cập nhật liên tục 500ms:</strong> Tự động lấy số liệu và vẽ lại biểu đồ mà không cần người dùng tải lại trang web.</li>
-                                <li><strong>Trung tâm điều khiển trực quan:</strong> Cho phép bấm các nút thử nghiệm để kích hoạt kết nối mạng ngay trên trình duyệt và theo dõi biểu đồ nhảy số tức thì.</li>
-                            </ul>
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box green-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🖥️</span>
+                                <div>
+                                    <div class="bento-title">Web Dashboard Canvas 60 FPS</div>
+                                    <div class="bento-subtitle">Giao diện điều khiển và giám sát trực quan thời gian thực</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge green">REAL-TIME MONITOR</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box green">
+                                <span class="m-val">60 FPS</span>
+                                <span class="m-lbl">Động cơ Canvas vẽ biểu đồ sóng mượt mà</span>
+                            </div>
+                            <div class="metric-badge-box green">
+                                <span class="m-val">500 ms</span>
+                                <span class="m-lbl">Tần suất làm mới dữ liệu tự động liên tục</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">📈</div>
+                                <div class="sub-card-content">
+                                    <strong>4 Biểu Đồ Sóng Động</strong>
+                                    <span>Theo dõi đồng thời: Số kết nối, Luồng OS, Độ trễ mạng và Mức ngốn CPU máy chủ.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">🎮</div>
+                                <div class="sub-card-content">
+                                    <strong>Bàn Điều Khiển Bắn Tải</strong>
+                                    <span>Nút bấm kích hoạt tải tức thì, mô phỏng mạng trễ và tải nặng CPU ngay trên web.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill green">
+                            🚀 <strong>Trực quan:</strong> Biến các khái niệm đa luồng vô hình thành biểu đồ sóng chuyển động sống động
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">🖥️</span>
+                    <div><strong>GIẢI PHÁP ĐO ĐẠC:</strong> Hệ thống giám sát được xây dựng hoàn toàn bằng <strong>Vanilla JS + Canvas + Server-Sent Events/REST</strong>, vận hành tự chủ 100% không cần cài đặt thêm phần mềm giám sát ngoài!</div>
                 </div>
             </div>
 
@@ -1942,23 +3052,103 @@
                 </div>
 
                 <div class="grid-2" style="margin-top: 8px;">
-                    <div class="card green-accent">
-                        <div class="card-title">📊 Đột Phá Thông Lượng Của Virtual Threads</div>
-                        <div class="card-body">
-                            • <strong>Mode 4 vượt trội gấp 7.5 lần</strong> so với Thread Pool chuẩn doanh nghiệp (Mode 3).<br>
-                            • <strong>Mode 4 gấp 116 lần</strong> so với mô hình đơn luồng tuần tự (Mode 1).<br>
-                            • <strong>Mode 5 tự viết đạt hiệu năng ngang ngửa 98%</strong> so với thư viện tiêu chuẩn Oracle.
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box green-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">📊</span>
+                                <div>
+                                    <div class="bento-title">Đột Phá Thông Lượng (Throughput)</div>
+                                    <div class="bento-subtitle">So sánh năng lực xử lý giữa các kiến trúc luồng</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge green">VƯỢT TRỘI 7.5x</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box green">
+                                <span class="m-val">1,145 RPS</span>
+                                <span class="m-lbl">Virtual Threads dẫn đầu tuyệt đối ở tải cao</span>
+                            </div>
+                            <div class="metric-badge-box green">
+                                <span class="m-val">116x</span>
+                                <span class="m-lbl">Mức tăng tốc kỷ lục so với đơn luồng tuần tự</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">🚀</div>
+                                <div class="sub-card-content">
+                                    <strong>Gấp 7.5 Lần Worker Pool</strong>
+                                    <span>Mode 4 vượt xa giới hạn 152 RPS của Thread Pool cố định nhờ nhả lõi CPU khi chờ I/O.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge green">⚙️</div>
+                                <div class="sub-card-content">
+                                    <strong>Mode 5 Tự Viết Đạt 98%</strong>
+                                    <span>Custom Pool tự viết từ đầu đạt ~148.6 RPS, bám sát 98% hiệu năng thư viện Oracle chuẩn.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill green">
+                            ✨ <strong>Kết luận:</strong> Virtual Threads mở ra kỷ nguyên mới cho lập trình mạng thông lượng cao
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-title">🧵 Tiêu Hao Số Lượng Luồng Hệ Điều Hành (Tại Tải 1,000 Kết Nối)</div>
-                        <div class="card-body">
-                            • <strong>Mode 2:</strong> Bùng nổ 500+ luồng, RAM Stack ngốn hơn 550MB.<br>
-                            • <strong>Mode 3 & Mode 5:</strong> Giữ chặt an toàn ở <strong>16 luồng cố định</strong>.<br>
-                            • <strong>Mode 4:</strong> Chỉ tiêu tốn <strong>15 — 16 luồng thật</strong>, giải quyết triệt để rào cản tài nguyên!
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box blue-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🧵</span>
+                                <div>
+                                    <div class="bento-title">Tiêu Hao Luồng Hệ Điều Hành</div>
+                                    <div class="bento-subtitle">Kiểm soát tài nguyên ở mức tải 1,000 kết nối dồn dập</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge blue">TIẾT KIỆM RAM TỐI ĐA</span>
+                        </div>
+
+                        <div class="metric-callout-row">
+                            <div class="metric-badge-box">
+                                <span class="m-val">16 Luồng OS</span>
+                                <span class="m-lbl">Mode 3, Mode 4, Mode 5 giữ phẳng lì ở 16 luồng</span>
+                            </div>
+                            <div class="metric-badge-box red">
+                                <span class="m-val">500+ Luồng</span>
+                                <span class="m-lbl">Mode 2 bùng nổ luồng gây nghẽn và ngốn RAM</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-subgrid">
+                            <div class="sub-card">
+                                <div class="sub-icon-badge rose">⚠️</div>
+                                <div class="sub-card-content">
+                                    <strong>Mode 2 Bùng Nổ Nguy Hiểm</strong>
+                                    <span>Tạo luồng ồ ạt ngốn hơn 550MB RAM Stack, CPU kiệt sức vì tráo đổi luồng.</span>
+                                </div>
+                            </div>
+                            <div class="sub-card">
+                                <div class="sub-icon-badge blue">🛡️</div>
+                                <div class="sub-card-content">
+                                    <strong>Bảo Vệ Tài Nguyên Tuyệt Đối</strong>
+                                    <span>Mode 3 & 4 duy trì ổn định vĩnh viễn, không bao giờ rơi vào trạng thái cạn RAM.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill blue">
+                            💡 <strong>Điểm nhấn:</strong> Phục vụ 1,000 khách hàng mà chỉ cần đúng 16 công nhân hệ điều hành
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">📊</span>
+                    <div><strong>KẾT QUẢ ĐỊNH LƯỢNG:</strong> Số liệu chứng minh thực tế <strong>Virtual Threads đạt thông lượng cao nhất (1,145 RPS)</strong> với chi phí luồng hệ thống thấp nhất (16 Carrier Threads), giải quyết trọn vẹn bài toán C10K!</div>
                 </div>
             </div>
 
@@ -2063,29 +3253,113 @@
 
             <div class="slide-content">
                 <div class="grid-3">
-                    <div class="card primary-accent">
-                        <div class="card-title">1. Làm Chủ Nguyên Lý Tầng Thấp</div>
-                        <div class="card-body">
-                            • Tự thiết kế máy chủ giao tiếp mạng thủ công từ tầng Socket gốc rễ.<br>
-                            • Nắm vững các cơ chế thực tế: Hàng đợi kết nối TCP, Chi phí bộ nhớ của luồng và Tổn hao khi chuyển đổi luồng ở cấp hệ điều hành.
+                    <!-- BENTO BOX 1 -->
+                    <div class="bento-box blue-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🏢</span>
+                                <div>
+                                    <div class="bento-title">Làm Chủ Tầng Thấp</div>
+                                    <div class="bento-subtitle">Nền tảng mạng máy tính gốc rễ</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge blue">SOCKET NGUYÊN BẢN</span>
+                        </div>
+
+                        <div class="sub-card">
+                            <div class="sub-icon-badge blue">⚙️</div>
+                            <div class="sub-card-content">
+                                <strong>Lập Trình Socket Từ Số 0</strong>
+                                <span>Tự tay xây dựng kiến trúc TCP Socket không phụ thuộc Netty hay Spring Framework.</span>
+                            </div>
+                        </div>
+
+                        <div class="sub-card">
+                            <div class="sub-icon-badge blue">🧠</div>
+                            <div class="sub-card-content">
+                                <strong>Hiểu Bản Chất Phần Cứng</strong>
+                                <span>Làm chủ chi phí Stack RAM 1MB, hàng đợi TCP Backlog và tổn hao chuyển ngữ cảnh CPU.</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill blue">
+                            💡 <strong>Nền tảng:</strong> Nắm chắc bản chất vật lý cốt lõi của hệ thống mạng
                         </div>
                     </div>
 
-                    <div class="card purple-accent">
-                        <div class="card-title">2. Năng Lực Tự Chủ Công Nghệ</div>
-                        <div class="card-body">
-                            • Tự lập trình trọn vẹn giải thuật <strong>Băng chuyền xoay vòng O(1)</strong> và cơ chế đồng bộ hóa đánh thức / ngủ đông luân phiên.<br>
-                            • Xây dựng Web Dashboard đồ họa 60fps và Công cụ đo đạc tải tự động <strong>không phụ thuộc bất kỳ thư viện ngoài nào</strong>.
+                    <!-- BENTO BOX 2 -->
+                    <div class="bento-box purple-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">⚙️</span>
+                                <div>
+                                    <div class="bento-title">Tự Chủ Công Nghệ</div>
+                                    <div class="bento-subtitle">Điểm sáng sáng tạo 30% đề tài</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge purple">ĐIỂM SÁNG 30%</span>
+                        </div>
+
+                        <div class="sub-card">
+                            <div class="sub-icon-badge purple">🍣</div>
+                            <div class="sub-card-content">
+                                <strong>Băng Chuyền O(1) Tự Viết</strong>
+                                <span>Tự lập trình giải thuật mảng vòng Circular Buffer và cơ chế ngủ đông luồng độc lập.</span>
+                            </div>
+                        </div>
+
+                        <div class="sub-card">
+                            <div class="sub-icon-badge purple">🖥️</div>
+                            <div class="sub-card-content">
+                                <strong>Web Dashboard Canvas 60fps</strong>
+                                <span>Tự xây dựng trọn gói giao diện điều khiển thời gian thực và công cụ bắn tải đa luồng.</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill purple">
+                            ✨ <strong>Tự lực:</strong> Khẳng định năng lực làm chủ giải thuật độc lập 100%
                         </div>
                     </div>
 
-                    <div class="card green-accent">
-                        <div class="card-title">3. Hiện Đại Hóa Kiến Trúc</div>
-                        <div class="card-body">
-                            • Ứng dụng thành công công nghệ luồng ảo hiện đại của Java 21.<br>
-                            • Giải quyết trọn vẹn bài toán hàng nghìn kết nối đồng thời: Giữ nguyên cách viết code trực quan, tự nhiên nhưng đạt thông lượng kỷ lục 1,145+ req/s.
+                    <!-- BENTO BOX 3 -->
+                    <div class="bento-box green-theme">
+                        <div class="bento-header">
+                            <div class="bento-title-group">
+                                <span class="bento-icon">🍃</span>
+                                <div>
+                                    <div class="bento-title">Hiện Đại Hóa Kiến Trúc</div>
+                                    <div class="bento-subtitle">Đỉnh cao Java 21 Project Loom</div>
+                                </div>
+                            </div>
+                            <span class="bento-badge green">JAVA 21 LOOM</span>
+                        </div>
+
+                        <div class="sub-card">
+                            <div class="sub-icon-badge green">🚀</div>
+                            <div class="sub-card-content">
+                                <strong>Vượt Thách Thức C10K</strong>
+                                <span>Phục vụ hàng chục ngàn kết nối với kỷ lục 1,145+ RPS trên máy tính cá nhân tiêu chuẩn.</span>
+                            </div>
+                        </div>
+
+                        <div class="sub-card">
+                            <div class="sub-icon-badge green">💎</div>
+                            <div class="sub-card-content">
+                                <strong>Code Đơn Giản, Tốc Độ Khủng</strong>
+                                <span>Giữ trọn phong cách code tuần tự dễ bảo trì nhưng đạt hiệu năng phi đồng bộ tối tân.</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-footer-pill green">
+                            👑 <strong>Tầm nhìn:</strong> Sẵn sàng áp dụng cho các hệ thống backend quy mô lớn
                         </div>
                     </div>
+                </div>
+
+                <!-- FULL-WIDTH TAKEAWAY -->
+                <div class="takeaway-banner">
+                    <span class="takeaway-icon">🏆</span>
+                    <div><strong>KẾT LUẬN ĐỒ ÁN:</strong> Đề tài T45 đã hoàn thành xuất sắc mục tiêu nghiên cứu, thực nghiệm và cài đặt trọn vẹn <strong>5 mô hình đa luồng đối đầu</strong>, cung cấp cái nhìn khoa học sâu sắc từ lý thuyết hàn lâm đến ứng dụng thực tiễn!</div>
                 </div>
             </div>
 
