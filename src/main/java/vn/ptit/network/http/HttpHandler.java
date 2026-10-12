@@ -210,13 +210,18 @@ public class HttpHandler {
 
         Thread.ofVirtual().name("benchmark-process-launcher").start(() -> {
             try {
-                String jdkPath = "C:\\Users\\maiduc.vinh\\.jdks\\ms-21.0.10\\bin\\java.exe";
-                String javaCmd = new File(jdkPath).exists() ? jdkPath : "java";
+                String javaHome = System.getProperty("java.home");
+                File javaBin = new File(javaHome, "bin/java.exe");
+                if (!javaBin.exists()) {
+                    javaBin = new File(javaHome, "bin/java");
+                }
+                String javaCmd = javaBin.exists() ? javaBin.getAbsolutePath() : "java";
+                String classpath = "target" + File.separator + "classes" + File.pathSeparator + "lib" + File.separator + "*";
 
                 ProcessBuilder pb = new ProcessBuilder(
                         javaCmd,
                         "-Dfile.encoding=UTF-8",
-                        "-cp", "target/classes;lib/*",
+                        "-cp", classpath,
                         "vn.ptit.network.benchmark.JavaLoadTester",
                         "-c", String.valueOf(concurrency),
                         "-n", String.valueOf(totalRequests),

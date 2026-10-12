@@ -153,7 +153,7 @@ Ngoài các nút bắn tải hàng loạt, bạn có thể click thử 3 nút đ
 ---
 
 ## 🔗 TÀI LIỆU LIÊN QUAN
-* 📘 [Đặc tả Kiến trúc & Luồng hoạt động chi tiết 5 Mode](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/architecture-and-execution-flow.md)
-* ⏱️ [Kịch bản thuyết trình Live Demo từng phút](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/demo-script.md)
-* 🛡️ [Cẩm nang 7 câu hỏi phản biện chuyên sâu Q&A](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/qa-defense-guide.md)
-* 📑 [Đề cương Slide báo cáo 18 Slides](file:///c:/Users/maiduc.vinh/OneDrive%20-%20VietCredit/Desktop/NetworkProgramming/docs/presentation-outline.md)
+* 📘 [Đặc tả Kiến trúc & Luồng hoạt động chi tiết 5 Mode](architecture-and-execution-flow.md)
+* ⏱️ [Kịch bản thuyết trình Live Demo từng phút](demo-script.md)
+* 🛡️ [Cẩm nang 7 câu hỏi phản biện chuyên sâu Q&A](qa-defense-guide.md)
+* 📑 [Đề cương Slide báo cáo 18 Slides](presentation-outline.md)
